@@ -1,6 +1,6 @@
 # toiot-lora-sensor-node-driver
 
-## Getting Started with LoRaWAN
+## Getting Started with LoRa
 
 ### Things to know before you begin.   
 * It must be in compliance with the national frequency band regulations.   
@@ -17,3 +17,8 @@ Connect SX1278 with arduino as shown as below.
 - For NodeMCU SENDER:    
 Connect SX1278 with NodeMCU as shown as below.   
 ![LoRa_with_NodeMCU](https://user-images.githubusercontent.com/49184890/104408324-2561d500-55a7-11eb-88b7-c84003821d7b.PNG)   
+
+### Installing libraries
+- RadioHead: http://www.airspayce.com/mikem/arduino/RadioHead/   
+- Base64: https://github.com/adamvr/arduino-base64   
+- AESLib: https://github.com/DavyLandman/AESLib   
