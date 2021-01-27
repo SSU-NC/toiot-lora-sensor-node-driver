@@ -2,9 +2,9 @@
 #include <RH_RF95.h> // RF95 from RadioHead Librarey 
 #include <Wire.h>
 
-#define RFM95_CS 15 //CS if Lora connected to pin 10
-#define RFM95_RST 16 //RST of Lora connected to pin 9
-#define RFM95_INT 4 //INT of Lora connected to pin 2
+#define RFM95_CS 15 //NSS
+#define RFM95_RST 16 //RST
+#define RFM95_INT 4 //INT (DIO pin)
 
 // Change to 434.0 or other frequency, must match RX's freq!
 #define RF95_FREQ 434.0
