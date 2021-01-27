@@ -1,6 +1,6 @@
 # toiot-lora-sensor-node-driver
 
-## Getting Started with LoRaWAN
+## Getting Started with LoRa
 
 ### Things to know before you begin.   
 * It must be in compliance with the national frequency band regulations.   
