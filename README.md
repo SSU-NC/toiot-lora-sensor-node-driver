@@ -21,4 +21,8 @@ Connect SX1278 with NodeMCU as shown as below.
 ### Installing libraries
 - RadioHead: http://www.airspayce.com/mikem/arduino/RadioHead/   
 - Base64: https://github.com/adamvr/arduino-base64   
-- AESLib: https://github.com/DavyLandman/AESLib   
+- AESLib: https://www.arduino.cc/reference/en/libraries/aeslib/
+
+### Available board   
+- ESP (TESTED)   
+- Arduino (NOT TESTED)   
