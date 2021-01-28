@@ -10,6 +10,7 @@
 * But in this project, we used 433 MHz for test.   
 * Encrypt messages using AES-128.
    
+### Connection
 - For Arduino:    
 Connect SX1278 with arduino as shown as below.   
 ![Transmitting-Side-Connecting-LoRa-SX1278-with-Arduino-UNO](https://user-images.githubusercontent.com/49184890/104311794-12a0bf00-5519-11eb-8039-b8d42397c83b.png)
