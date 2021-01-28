@@ -6,7 +6,9 @@ ToIoTwithLoRa t;
 
 void setup() 
 {
-	t.setupToIoTwithLoRa(nodeId, rfm_cs, rfm_rst, rfm_int, rfm_freq);
+	t.setupToIoTwithLoRa(nodeId, rfm_cs, rfm_rst, rfm_int, rf_freq);
+	t.setupAES(AES_key, AES_iv);
+	//t.aes_init();
 }
 
 void loop()

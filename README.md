@@ -6,9 +6,9 @@
 * It must be in compliance with the national frequency band regulations.   
 * According to the LoRa Alliance document, **the unlicensed ISM band for Lora's use in Korea is specified as 920-923.**   
 * The 433 MHz band used by the SX1278 LoRa chip is a limited frequency band in Korea.   
-* The 433 MHz band frequency is the band assigned to the **HAM**.   
 * To use LoRa **in Korea, LBT(Listen Before Talk)** should be used in Korea.   
 * But in this project, we used 433 MHz for test.   
+* Encrypt messages using AES-128.
    
 - For Arduino:    
 Connect SX1278 with arduino as shown as below.   
@@ -21,4 +21,8 @@ Connect SX1278 with NodeMCU as shown as below.
 ### Installing libraries
 - RadioHead: http://www.airspayce.com/mikem/arduino/RadioHead/   
 - Base64: https://github.com/adamvr/arduino-base64   
-- AESLib: https://github.com/DavyLandman/AESLib   
+- AESLib: https://www.arduino.cc/reference/en/libraries/aeslib/
+
+### Available board   
+- ESP (TESTED)   
+- Arduino (NOT TESTED)   

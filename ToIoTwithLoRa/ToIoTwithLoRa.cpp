@@ -3,6 +3,9 @@
 #include <stdarg.h>
 #include "Arduino.h"
 #include <RH_RF95.h>
+#include <AESLib.h>
+
+#define BAUDRATE 115200
 
 ToIoTwithLoRa::ToIoTwithLoRa()
 {
@@ -14,7 +17,7 @@ void ToIoTwithLoRa::setupToIoTwithLoRa(char* nodeI, int CS, int RST, int INT, fl
 	RF95_FREQ = FREQ;
 	rf95 = new RH_RF95(CS, INT);
 
-	Serial.begin(115200);
+	Serial.begin(BAUDRATE);
 
 	pinMode(RFM95_RST, OUTPUT);
 	digitalWrite(RFM95_RST, LOW);
@@ -22,7 +25,7 @@ void ToIoTwithLoRa::setupToIoTwithLoRa(char* nodeI, int CS, int RST, int INT, fl
 	digitalWrite(RFM95_RST, HIGH);
 	delay(10);
 
-	while (!rf95->init()) {
+	while(!rf95->init()) {
 		Serial.println("LoRa radio init failed");
 		while(1);
 	}
@@ -33,6 +36,64 @@ void ToIoTwithLoRa::setupToIoTwithLoRa(char* nodeI, int CS, int RST, int INT, fl
 	}
 
 	rf95->setTxPower(18);
+}
+
+void ToIoTwithLoRa::setupAES(byte* key, byte* iv)
+{
+	memcpy(aes_key, key, sizeof(key));
+	memcpy(aes_iv, iv, sizeof(iv));
+	aes_init();
+}
+
+void ToIoTwithLoRa::aes_init()
+{
+	aesLib.gen_iv(aes_iv);
+	aesLib.set_paddingmode((paddingMode)0);
+}
+
+void ToIoTwithLoRa::print_iv() {
+	byte null_iv[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	char iv[256];
+	int ivlen = base64_encode(iv, (char*)null_iv, 16);
+	Serial.println(iv);
+}
+
+
+String ToIoTwithLoRa::encrypt(char * msg, byte iv[]) {
+	unsigned long ms = micros();
+	int msgLen = strlen(msg);
+	char encrypted[2 * msgLen];
+	aesLib.encrypt64(msg, msgLen, encrypted, aes_key, sizeof(aes_key), iv);
+	Serial.print("Encryption took: ");
+	Serial.print(micros() - ms);
+	Serial.println("us");
+	return String(encrypted);
+}
+
+String ToIoTwithLoRa::decrypt(char * msg, byte iv[]) {
+	unsigned long ms = micros();
+	int msgLen = strlen(msg);
+	char decrypted[msgLen]; // half may be enough
+	aesLib.decrypt64(msg, msgLen, decrypted, aes_key, sizeof(aes_key), iv);
+	Serial.print("Decryption [2] took: ");
+	Serial.print(micros() - ms);
+	Serial.println("us");
+	return String(decrypted);
+}
+
+
+void ToIoTwithLoRa::print_key_iv()
+{
+	int i;
+	Serial.println("AES IV: ");
+	for(i=0; i<sizeof(aes_iv); i++) {
+		Serial.print(aes_iv[i], DEC);
+		if((i+1)<sizeof(aes_iv)) {
+			Serial.print(",");
+		}
+	}
+
+	Serial.println("");
 }
 
 void ToIoTwithLoRa::pub(char* sensorId, int cnt, ...)
@@ -61,6 +122,16 @@ void ToIoTwithLoRa::pub(char* sensorId, int cnt, ...)
     Serial.print(topic);
     Serial.print(":");
     Serial.println(msg);
-    rf95->send((uint8_t *)msg, 50);
-}
+    
+    print_key_iv();
+    print_iv();
 
+    byte enc_iv[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    encrypted = encrypt(msg, enc_iv);
+    
+    sprintf(cipher, "%s", encrypted.c_str());
+    Serial.print("[Encrypted]:");
+    Serial.println(encrypted);
+
+    rf95->send((uint8_t*)cipher, sizeof((uint8_t*)cipher));
+}
