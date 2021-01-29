@@ -36,6 +36,9 @@ void ToIoTwithLoRa::setupToIoTwithLoRa(char* nodeI, int CS, int RST, int INT, fl
 	}
 
 	rf95->setTxPower(18);
+
+	nodeId = nodeI;
+	snprintf(topic, 26, "data/%s", nodeId);
 }
 
 void ToIoTwithLoRa::setupAES(byte* key, byte* iv)
@@ -96,15 +99,19 @@ void ToIoTwithLoRa::print_key_iv()
 	Serial.println("");
 }
 
+// rf95 max message size = 251
+// 
 void ToIoTwithLoRa::pub(char* sensorId, int cnt, ...)
 {
-    // if not connected
+	// if not connected
     //    reconnect();
     va_list ap;
     va_start(ap, cnt);
     int res = 0;
     memset(msg, 0, 50);
-    res = sprintf(msg, "%s,", sensorId);
+    //res = sprintf(msg, "%s,", sensorId);
+    res = sprintf(msg, "%s:%s,", topic, sensorId);
+
     for(int i=0; i<cnt; i++)
     {
         if(i == cnt-1)
@@ -119,10 +126,8 @@ void ToIoTwithLoRa::pub(char* sensorId, int cnt, ...)
     }
     va_end(ap);
     Serial.print("[Pub] ");
-    Serial.print(topic);
-    Serial.print(":");
     Serial.println(msg);
-    
+
     print_key_iv();
     print_iv();
 
@@ -132,6 +137,5 @@ void ToIoTwithLoRa::pub(char* sensorId, int cnt, ...)
     sprintf(cipher, "%s", encrypted.c_str());
     Serial.print("[Encrypted]:");
     Serial.println(encrypted);
-
-    rf95->send((uint8_t*)cipher, sizeof((uint8_t*)cipher));
+    rf95->send((uint8_t*)cipher, strlen(cipher));
 }

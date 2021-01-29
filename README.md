@@ -10,6 +10,7 @@
 * But in this project, we used 433 MHz for test.   
 * Encrypt messages using AES-128.
    
+### Connection
 - For Arduino:    
 Connect SX1278 with arduino as shown as below.   
 ![Transmitting-Side-Connecting-LoRa-SX1278-with-Arduino-UNO](https://user-images.githubusercontent.com/49184890/104311794-12a0bf00-5519-11eb-8039-b8d42397c83b.png)
@@ -26,3 +27,25 @@ Connect SX1278 with NodeMCU as shown as below.
 ### Available board   
 - ESP (TESTED)   
 - Arduino (NOT TESTED)   
+
+
+## LoRa Packet Information
+
+### RF95 Packet format
+**All messages sent and received by this RH_RF95 Driver conform to this packet format:**
+- LoRa mode:   
+- 8 symbol PREAMBLE   
+- Explicit header with header CRC (default CCITT, handled internally by the radio)   
+- 4 octets HEADER: (TO, FROM, ID, FLAGS)   
+- 0 to 251 octets DATA   
+- CRC (default CCITT, handled internally by the radio)   
+
+### Frame Structure   
+http://www.techplayon.com/lora-long-range-network-architecture-protocol-architecture-and-frame-formats/   
+
+### MAC Layer   
+https://m.blog.naver.com/PostView.nhn?blogId=tnseo444&logNo=221140719936&proxyReferer=https:%2F%2Fwww.google.co.kr%2F   
+
+### OTAA & ABP communication   
+http://www.techplayon.com/lora-device-activation-call-flow-join-procedure-using-otaa-and-abp/   
+
