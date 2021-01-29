@@ -53,3 +53,5 @@ https://m.blog.naver.com/PostView.nhn?blogId=tnseo444&logNo=221140719936&proxyRe
 ### OTAA & ABP communication   
 http://www.techplayon.com/lora-device-activation-call-flow-join-procedure-using-otaa-and-abp/   
 
+### LoRaWAN Specification - LoRa Alliance
+https://lora-alliance.org/wp-content/uploads/2020/11/LoRaWAN-1.0.4-Specification-Package_0.zip
