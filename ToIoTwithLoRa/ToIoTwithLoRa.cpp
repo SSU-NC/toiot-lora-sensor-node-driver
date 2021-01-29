@@ -103,7 +103,7 @@ void ToIoTwithLoRa::print_key_iv()
 // 
 void ToIoTwithLoRa::pub(char* sensorId, int cnt, ...)
 {
-    // if not connected
+	// if not connected
     //    reconnect();
     va_list ap;
     va_start(ap, cnt);
@@ -137,6 +137,5 @@ void ToIoTwithLoRa::pub(char* sensorId, int cnt, ...)
     sprintf(cipher, "%s", encrypted.c_str());
     Serial.print("[Encrypted]:");
     Serial.println(encrypted);
-
-    rf95->send((uint8_t*)cipher, sizeof((uint8_t*)cipher));
+    rf95->send((uint8_t*)cipher, strlen(cipher));
 }
