@@ -2,9 +2,10 @@
 
 ## Things to know before you begin.   
 * It must be in compliance with the national frequency band regulations.   
-* According to the LoRa Alliance document, **the unlicensed ISM band for Lora's use in Korea is specified as 920-923.**   
+* According to the LoRa Alliance document, **the unlicensed ISM band for Lora's use in Korea is specified as 920-923.**(Check this PDF.)     
+https://lora-alliance.org/wp-content/uploads/2019/11/rp_2-1.0.0_final_release.pdf
 * The 433 MHz band used by the SX1278 LoRa chip is a limited frequency band in Korea.   
-* To use LoRa **in Korea, LBT(Listen Before Talk)** should be used in Korea.   
+* To use LoRa **in Korea, LBT(Listen Before Talk)** should be used in Korea.  
 * But in this project, we used 433 MHz for test.   
 * Encrypt messages using AES-128.
 
