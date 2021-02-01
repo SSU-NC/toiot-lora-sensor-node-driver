@@ -2,15 +2,15 @@
 
 Arduino LoRaWAN library by Beelan
 ====================
-This repository contains the simple LoRaWAN library encapsulated to run in the generic platform, allowing using the SX1272, SX1276 transceivers and compatible modules (such as some HopeRF RFM9x modules).
+This repository contains the simple LoRaWAN library encapsulated to run in the generic platform, allowing using the SX1272, SX1276, **SX1278** transceivers and compatible modules (such as some HopeRF RFM9x modules).
 
-This repository is all based on the library originally created by Ideetron B.V.
-And upgraded by BeelanMX. 
-This library is slightly modified from this [repo](https://github.com/BeelanMX/Beelan-LoRaWAN), with the principal purpose to have an LoRaWAN MAC layer for arduino with an easy API.
+This repository is all based on the library **originally created by Ideetron B.V.**
+**And this is a modification of the upgrade version created by BeelanMX.**
+**This library is slightly modified from this [repo](https://github.com/BeelanMX/Beelan-LoRaWAN), with the principal purpose to have an LoRaWAN MAC layer for arduino with an easy API.**
 
 Features
 --------
-The arduino LoRaWAN library supports LoRaWAN Class A and Class C implementations operating in EU-868, AS-923, US-915, AU-915 and EU-433 bands. Note that this library is fairly simple with the aim of demonstrating the LoRaWAN capabilities.
+The arduino LoRaWAN library supports LoRaWAN Class A and Class C implementations operating in EU-868, AS-923, US-915, AU-915 and **EU-433** bands. Note that this library is fairly simple with the aim of demonstrating the LoRaWAN capabilities.
 
 ### What certainly works:
  - Sending packets uplink, taking into account duty cycling.
@@ -112,10 +112,6 @@ For example, this could look like this:
 API
 --------
 See [API.md](API.md).
-
-Tests
--------
- - See [Test Folder](test/README.md) 
 
 License
 -------
