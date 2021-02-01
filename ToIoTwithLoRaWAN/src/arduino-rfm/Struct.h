@@ -105,9 +105,7 @@ typedef enum {
   CH5 = 5,
   CH6 = 6,
   CH7 = 7,
-#ifdef EU_868
-  CHRX2 = 8,
-#elif EU_434
+#if defined(EU_868) || defined(EU_433)
   CHRX2 = 8,
 #else
   CH8 = 8,
@@ -152,7 +150,7 @@ typedef enum {
     SF8BW125    = 0x04,
     SF7BW125    = 0x05,
     SF7BW250    = 0x06
-#elif defined(EU_434)
+#elif defined(EU_433)
     SF12BW125   = 0x00,
     SF11BW125   = 0x01,
     SF10BW125   = 0x02,

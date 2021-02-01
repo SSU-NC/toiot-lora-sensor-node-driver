@@ -416,7 +416,7 @@ static void RFM_Change_Datarate(unsigned char Datarate)
     RFM_change_SF_BW(7,0x09);
     break;
   }
-#elif //EU_868 or AS_923
+#elif defined(EU_868) || defined(AS_923)
   switch (Datarate) {
   case 0x00:  // SF12BW125
     RFM_change_SF_BW(12,0x07);
@@ -748,7 +748,7 @@ void RFM_Continuous_Receive(sSettings *LoRa_Settings)
 #ifdef EU_868 
   RFM_Change_Datarate(SF12BW125);
   RFM_Change_Channel(CHRX2);
-#elif EU_434
+#elif defined(EU_433)
 // The RX2 receive window uses a fixed frequency and data rate. 434.665MHz / DR0 (SF12, 125 kHz).
   RFM_Change_Datarate(SF12BW125);
   RFM_Change_Channel(CHRX2);

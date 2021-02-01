@@ -89,7 +89,7 @@ bool LoRaWANClass::init(void)
     // Rx
 #if defined(AS_923)
     LoRa_Settings.Datarate_Rx = 0x02;   //set to SF10 BW 125 kHz
-#elif defined(EU_868)
+#elif defined(EU_868) || defined(EU_433)
     LoRa_Settings.Datarate_Rx = 0x03;   //set to SF9 BW 125 kHz
 #else //US_915 or AU_915
     LoRa_Settings.Datarate_Rx = 0x0C;   //set to SF8 BW 500 kHz
@@ -122,9 +122,9 @@ bool LoRaWANClass::init(void)
     //Initialize I/O pins
     pinMode(RFM_pins.DIO0,INPUT);
     pinMode(RFM_pins.DIO1,INPUT);
-    #ifdef BOARD_DRAGINO_SHIELD
-    pinMode(RFM_pins.DIO5,INPUT);
-    #endif
+    //#ifdef BOARD_DRAGINO_SHIELD
+    //pinMode(RFM_pins.DIO5,INPUT);
+    //#endif
     pinMode(RFM_pins.DIO2,INPUT);
     pinMode(RFM_pins.CS,OUTPUT);
     pinMode(RFM_pins.RST,OUTPUT);
@@ -320,7 +320,7 @@ void LoRaWANClass::setChannel(unsigned char channel)
         LoRa_Settings.Channel_Rx = channel + 0x08;  
 #elif defined(AU_915)
         LoRa_Settings.Channel_Rx = channel + 0x08;  
-#elif defined(EU_868)  
+#elif defined(EU_868) || defined(EU_433)
         LoRa_Settings.Channel_Rx = channel;
 #endif
     } else if (channel == MULTI) {
@@ -432,7 +432,7 @@ void LoRaWANClass::randomChannel()
     freq_idx = random(0,9);
     // limit drate, ch 8 -> sf7bw250
     LoRa_Settings.Datarate_Tx = freq_idx == 0x08? 0x06 : drate_common;
-#elif defined(EU_868)    
+#elif defined(EU_868) || defined(EU_433)
     freq_idx = random(0,7);
     LoRa_Settings.Channel_Rx=freq_idx;      // same rx and tx channel 
 #else // US_915 or AU_915

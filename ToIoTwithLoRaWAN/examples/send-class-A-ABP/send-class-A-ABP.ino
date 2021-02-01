@@ -29,7 +29,7 @@ const sRFM_pins RFM_pins = {
   .CS = 15,
   .RST = 16,
   .DIO0 = 4,
-  .DIO1 = 1,
+  .DIO1 = 5,
   .DIO2 = 2,
   .DIO5 = 15,
 };
@@ -37,13 +37,15 @@ const sRFM_pins RFM_pins = {
 void setup() {
   // Setup loraid access
   Serial.begin(115200);
-  while(!Serial);
+  delay(2000);
+  
+  //while(!Serial);
   if(!lora.init()){
     Serial.println("RFM95 not detected");
     delay(5000);
     return;
   }
-
+  Serial.println("DEBUG");
   // Set LoRaWAN Class change CLASS_A or CLASS_C
   lora.setDeviceClass(CLASS_A);
 
@@ -57,6 +59,8 @@ void setup() {
   lora.setNwkSKey(nwkSKey);
   lora.setAppSKey(appSKey);
   lora.setDevAddr(devAddr);
+
+  Serial.println("SETUP DEBUG");
 }
 
 void loop() {
@@ -72,7 +76,7 @@ void loop() {
     lora.sendUplink(myStr, strlen(myStr), 0, 1);
     counter++;
   }
-
+  Serial.println("LOOP DEBUG");
   recvStatus = lora.readData(outStr);
   if(recvStatus) {
     Serial.println(outStr);
@@ -80,4 +84,5 @@ void loop() {
   
   // Check Lora RX
   lora.update();
+  delay(2000);
 }
