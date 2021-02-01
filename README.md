@@ -1,14 +1,19 @@
 # toiot-lora-sensor-node-driver
 
-## Getting Started with LoRa
-
-### Things to know before you begin.   
+## Things to know before you begin.   
 * It must be in compliance with the national frequency band regulations.   
-* According to the LoRa Alliance document, **the unlicensed ISM band for Lora's use in Korea is specified as 920-923.**   
+* According to the LoRa Alliance document, **the unlicensed ISM band for Lora's use in Korea is specified as 920-923.**(Check this PDF.)     
+https://lora-alliance.org/wp-content/uploads/2019/11/rp_2-1.0.0_final_release.pdf
 * The 433 MHz band used by the SX1278 LoRa chip is a limited frequency band in Korea.   
-* To use LoRa **in Korea, LBT(Listen Before Talk)** should be used in Korea.   
+* To use LoRa **in Korea, LBT(Listen Before Talk)** should be used in Korea.  
 * But in this project, we used 433 MHz for test.   
 * Encrypt messages using AES-128.
+
+## Getting Started with LoRa
+1. Use the Arduino Library Manager to install the `RadioHead`, `AESLib` library.
+2. Download `ToIoTwithLoRa` and put it in the Arduino/libraries folder.
+3. Fill in the contents of `config.h` and put it in the sketch folder. You can set this application through this file.
+4. Write the main source code like [example](https://github.com/gjlee0802/toiot-lora-sensor-node-driver/blob/main/ToIoTwithLoRa/examples/ToIoTwithLoRa/ToIoTwithLoRa.ino).
    
 ### Connection
 - For Arduino:    
@@ -21,8 +26,8 @@ Connect SX1278 with NodeMCU as shown as below.
 
 ### Installing libraries
 - RadioHead: http://www.airspayce.com/mikem/arduino/RadioHead/   
-- Base64: https://github.com/adamvr/arduino-base64   
 - AESLib: https://www.arduino.cc/reference/en/libraries/aeslib/
+- Base64: https://github.com/adamvr/arduino-base64   
 
 ### Available board   
 - ESP (TESTED)   
@@ -39,13 +44,3 @@ Connect SX1278 with NodeMCU as shown as below.
 - 4 octets HEADER: (TO, FROM, ID, FLAGS)   
 - 0 to 251 octets DATA   
 - CRC (default CCITT, handled internally by the radio)   
-
-### Frame Structure   
-http://www.techplayon.com/lora-long-range-network-architecture-protocol-architecture-and-frame-formats/   
-
-### MAC Layer   
-https://m.blog.naver.com/PostView.nhn?blogId=tnseo444&logNo=221140719936&proxyReferer=https:%2F%2Fwww.google.co.kr%2F   
-
-### OTAA & ABP communication   
-http://www.techplayon.com/lora-device-activation-call-flow-join-procedure-using-otaa-and-abp/   
-
