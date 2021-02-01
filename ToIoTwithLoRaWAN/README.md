@@ -1,6 +1,6 @@
 ![LibraryBuild](https://github.com/BeelanMX/Beelan-LoRaWAN/workflows/LibraryBuild/badge.svg?branch=master)
 
-Arduino LoRaWAN library by Beelan
+Arduino LoRaWAN library by Beelan - (Modified by gjlee0802 to support EU-433)
 ====================
 This repository contains the simple LoRaWAN library encapsulated to run in the generic platform, allowing using the SX1272, SX1276, **SX1278** transceivers and compatible modules (such as some HopeRF RFM9x modules).
 
