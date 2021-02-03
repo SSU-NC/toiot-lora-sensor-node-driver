@@ -120,6 +120,13 @@ void LORA_Cycle(sBuffer *Data_Tx, sBuffer *Data_Rx, RFM_command_t *RFM_Command, 
 		LoRa_Settings->Datarate_Rx=SF9BW125;
 		LoRa_Settings->Channel_Rx=previousChannelRX;
 		LoRa_Settings->Datarate_Rx=previousDatarateRX;
+	#elif defined(EU_433)
+		unsigned char previousChannelRX=LoRa_Settings->Channel_Rx;
+		unsigned char previousDatarateRX=LoRa_Settings->Datarate_Rx;
+		LoRa_Settings->Channel_Rx=CHRX2;
+		LoRa_Settings->Datarate_Rx=SF9BW125;
+		LoRa_Settings->Channel_Rx=previousChannelRX;
+		LoRa_Settings->Datarate_Rx=previousDatarateRX;
 	#endif
 		LORA_Receive_Data(Data_Rx, Session_Data, OTAA_Data, Message_Rx, LoRa_Settings);
 		*RFM_Command = NO_RFM_COMMAND;
