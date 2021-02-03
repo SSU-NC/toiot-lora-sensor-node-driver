@@ -17,7 +17,7 @@ const char *devAddr = "00000000";
 const char *nwkSKey = "00000000000000000000000000000000";
 const char *appSKey = "00000000000000000000000000000000";
 
-const unsigned long interval = 10000;    // 10 s interval to send message
+const unsigned long interval = 1000;    // 10 s interval to send message
 unsigned long previousMillis = 0;  // will store last time message sent
 unsigned int counter = 0;     // message counter
 
@@ -30,7 +30,7 @@ const sRFM_pins RFM_pins = {
   .RST = 16,
   .DIO0 = 4,
   .DIO1 = 5,
-  .DIO2 = 2,
+  .DIO2 = 3,
   .DIO5 = 15,
 };
 
@@ -84,5 +84,5 @@ void loop() {
   
   // Check Lora RX
   lora.update();
-  delay(2000);
+  wdt_reset();
 }

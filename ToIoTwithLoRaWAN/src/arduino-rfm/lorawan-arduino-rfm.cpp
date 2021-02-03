@@ -105,7 +105,6 @@ bool LoRaWANClass::init(void)
     LoRa_Settings.Datarate_Tx = drate_common = 0x00;   //set to SF12 BW 125 kHz
 #endif
     LoRa_Settings.Channel_Tx = 0x00;    // set to channel 0
-
     LoRa_Settings.Confirm = 0x00; //0x00 unconfirmed, 0x01 confirmed
     LoRa_Settings.Channel_Hopping = 0x00; //0x00 no channel hopping, 0x01 channel hopping
 

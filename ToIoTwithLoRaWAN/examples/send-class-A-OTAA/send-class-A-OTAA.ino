@@ -13,9 +13,10 @@
 #include <lorawan.h>
 
 // OTAA credentials
-const char *devEui = "0000000000000000";
-const char *appEui = "0000000000000000";
-const char *appKey = "00000000000000000000000000000000";
+const char *devEui = "\x00\x47\x64\xb1\xab\xc6\x4f\x7c"; //"0000000000000000";
+const char *appEui = "\x70\xb3\xd5\x7e\xf0\x00\x51\x34"; //"0000000000000000";
+const char *appKey = "\xa1\x0f\x0e\x87\x0a\x15\x58\x40\x89\x73\xc0\x60\x1e\x19\xc3\xd1"; //"00000000000000000000000000000000";
+
 
 const unsigned long interval = 10000;    // 10 s interval to send message
 unsigned long previousMillis = 0;  // will store last time message sent
@@ -26,17 +27,17 @@ char outStr[255];
 byte recvStatus = 0;
 
 const sRFM_pins RFM_pins = {
-  .CS = 20,
-  .RST = 9,
-  .DIO0 = 0,
-  .DIO1 = 1,
-  .DIO2 = 2,
+  .CS = 15,
+  .RST = 16,
+  .DIO0 = 4,
+  .DIO1 = 5,
+  .DIO2 = 3,
   .DIO5 = 15,
 };
 
 void setup() {
   // Setup loraid access
-  Serial.begin(9600);
+  Serial.begin(115200);
   while(!Serial);
   if(!lora.init()){
     Serial.println("RFM95 not detected");
@@ -51,7 +52,7 @@ void setup() {
   lora.setDataRate(SF9BW125);
 
   // set channel to random
-  lora.setChannel(MULTI);
+  lora.setChannel(0);
   
   // Put OTAA Key and DevAddress here
   lora.setDevEUI(devEui);
