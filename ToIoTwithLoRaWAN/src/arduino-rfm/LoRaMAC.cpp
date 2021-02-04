@@ -165,7 +165,7 @@ void LORA_Send_Data(sBuffer *Data_Tx, sLoRa_Session *Session_Data, sSettings *Lo
   Message.DevAddr[3] = Session_Data->DevAddr[3];
 
   //Set up direction
-  Message.Direction = 0x00;
+  Message.Direction = 0x00;	//uplink
 
   //Load the frame counter from the session data into the message
   Message.Frame_Counter = *Session_Data->Frame_Counter;
@@ -181,6 +181,8 @@ void LORA_Send_Data(sBuffer *Data_Tx, sLoRa_Session *Session_Data, sSettings *Lo
   {
       Message.MAC_Header = Message.MAC_Header | 0x80;
   }
+
+
 
   //Build the Radio Package
   //Load mac header
@@ -221,8 +223,6 @@ void LORA_Send_Data(sBuffer *Data_Tx, sLoRa_Session *Session_Data, sSettings *Lo
     {
       RFM_Package.Data[RFM_Package.Counter++] = Data_Tx->Data[i];
     }
-
-
   }
 
   //Calculate MIC
@@ -235,6 +235,16 @@ void LORA_Send_Data(sBuffer *Data_Tx, sLoRa_Session *Session_Data, sSettings *Lo
   }
 
   //Send Package
+
+  unsigned char filter = 0x80;
+  Serial.print("MHDR: ");
+  for (int i=0; i<8; i++){
+	  if(RFM_Package.Data[0] & filter) Serial.print('1');
+	  else Serial.print('0');
+	  filter = filter >> 1;
+  }
+  Serial.println();
+
   RFM_Send_Package(&RFM_Package, LoRa_Settings);
 
   //Raise Frame counter
