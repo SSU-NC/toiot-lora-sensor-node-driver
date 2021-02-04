@@ -14,8 +14,8 @@
 
 //ABP Credentials 
 const char *devAddr = "00000000";
-const char *nwkSKey = "00000000000000000000000000000000";
-const char *appSKey = "00000000000000000000000000000000";
+char nwkSKey[] = "00000000000000000000000000000000";
+char appSKey[] = "00000000000000000000000000000000";
 
 const unsigned long interval = 1000;    // 10 s interval to send message
 unsigned long previousMillis = 0;  // will store last time message sent
@@ -53,7 +53,7 @@ void setup() {
   lora.setDataRate(SF8BW125);
 
   // set channel to random
-  lora.setChannel(MULTI);
+  lora.setChannel(0);
   
   // Put ABP Key and DevAddress here
   lora.setNwkSKey(nwkSKey);

@@ -1,16 +1,15 @@
 ![LibraryBuild](https://github.com/BeelanMX/Beelan-LoRaWAN/workflows/LibraryBuild/badge.svg?branch=master)
 
-Arduino LoRaWAN library by Beelan - (Modified by gjlee0802 to support EU-433)
+Arduino LoRaWAN library by Beelan
 ====================
-This repository contains the simple LoRaWAN library encapsulated to run in the generic platform, allowing using the SX1272, SX1276, **SX1278** transceivers and compatible modules (such as some HopeRF RFM9x modules).
+This repository contains the simple LoRaWAN library encapsulated to run in the generic platform, allowing using the SX1272, SX1276 transceivers and compatible modules (such as some HopeRF RFM9x modules).
 
-This repository is all based on the library **originally created by Ideetron B.V.**
-**And this is a modification of the upgrade version created by BeelanMX.**
-**This library is slightly modified from this [repo](https://github.com/BeelanMX/Beelan-LoRaWAN), with the principal purpose to have an LoRaWAN MAC layer for arduino with an easy API.**
+This repository is all based on the library originally created by Ideetron B.V. This library is slightly
+modified and this [repo]( https://git.antares.id/lorawan-loraid/arduino-loraid), with the principal purpose to have an LoRaWAN MAC layer for arduino with an easy API.
 
 Features
 --------
-The arduino LoRaWAN library supports LoRaWAN Class A and Class C implementations operating in EU-868, AS-923, US-915, AU-915 and **EU-433** bands. Note that this library is fairly simple with the aim of demonstrating the LoRaWAN capabilities.
+The arduino LoRaWAN library supports LoRaWAN Class A and Class C implementations operating in EU-868, AS-923, US-915 and AU-915 bands. Note that this library is fairly simple with the aim of demonstrating the LoRaWAN capabilities.
 
 ### What certainly works:
  - Sending packets uplink, taking into account duty cycling.
@@ -30,16 +29,21 @@ us know (creating a github issue is probably the best way for that).
 
 Quick Installing
 ----------
-Move this ToIoTwithLoRaWAN to your Arduino Libraries folder.
+To install, use the Arduino Library Manager and search for "Beelan LoraWAN" and install the library.
 
 Manual Installing
 ----------
 To install this library:
 
+ - install it using the Arduino Library manager ("Sketch" -> "Include
+   Library" -> "Manage Libraries..."), or
  - download a zipfile from github using the "Download ZIP" button and
    install it using the IDE ("Sketch" -> "Include Library" -> "Add .ZIP
    Library..."
  - clone this git repository into your sketchbook/libraries folder.
+
+For more info, see https://www.arduino.cc/en/Guide/Libraries
+
 
 Configuration
 -------------
@@ -112,6 +116,15 @@ For example, this could look like this:
 API
 --------
 See [API.md](API.md).
+
+Tests
+-------
+ - See [Test Folder](test/README.md) 
+
+Maintainer
+-------
+
+Beelan invests time and resources providing this open source design, please support Beelan!
 
 License
 -------
