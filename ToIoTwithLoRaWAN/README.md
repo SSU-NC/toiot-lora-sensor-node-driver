@@ -3,7 +3,7 @@ ToIoTwithLoRaWAN
 This repository contains the simple LoRaWAN library encapsulated to run in the generic platform, allowing using the SX1272, SX1276, SX1278 transceivers and compatible modules (such as some HopeRF RFM9x modules).
 
 This repository is all based on the library originally created by Beelan. This library is slightly
-modified and this [repo]( https://git.antares.id/lorawan-loraid/arduino-loraid), with the principal purpose to have an LoRaWAN MAC layer for arduino with an easy API.
+modified and this [repo](https://github.com/BeelanMX/Beelan-LoRaWAN), with the principal purpose to have an LoRaWAN MAC layer for arduino with an easy API.
 
 Features
 --------
