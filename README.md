@@ -5,10 +5,10 @@ For LoRa and LoRaWAN information, check this repo:
 https://github.com/gjlee0802/LoRaWAN-Study
 
 ## Getting Started with LoRa
-1. Use the Arduino Library Manager to install the `RadioHead`, `AESLib` library.
-2. Download `ToIoTwithLoRa` and put it in the Arduino/libraries folder.
+1. Use the Arduino Library Manager to install the `RadioHead`, `AESLib` library if you want to use `ToIoTwithLoRa`.
+2. Download `ToIoTwithLoRa`or `ToIoTwithLoRaWAN` and put it in the Arduino/libraries folder.
 3. Fill in the contents of `config.h` and put it in the sketch folder. You can set this application through this file.
-4. Write the main source code like [example](https://github.com/gjlee0802/toiot-lora-sensor-node-driver/blob/main/ToIoTwithLoRa/examples/ToIoTwithLoRa/ToIoTwithLoRa.ino).
+4. Write the main source code like example
    
 ### Connection
 - For Arduino:    
