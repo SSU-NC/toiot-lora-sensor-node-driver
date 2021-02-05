@@ -1,10 +1,8 @@
-![LibraryBuild](https://github.com/BeelanMX/Beelan-LoRaWAN/workflows/LibraryBuild/badge.svg?branch=master)
-
-Arduino LoRaWAN library by Beelan
+ToIoTwithLoRaWAN
 ====================
-This repository contains the simple LoRaWAN library encapsulated to run in the generic platform, allowing using the SX1272, SX1276 transceivers and compatible modules (such as some HopeRF RFM9x modules).
+This repository contains the simple LoRaWAN library encapsulated to run in the generic platform, allowing using the SX1272, SX1276, SX1278 transceivers and compatible modules (such as some HopeRF RFM9x modules).
 
-This repository is all based on the library originally created by Ideetron B.V. This library is slightly
+This repository is all based on the library originally created by Beelan. This library is slightly
 modified and this [repo]( https://git.antares.id/lorawan-loraid/arduino-loraid), with the principal purpose to have an LoRaWAN MAC layer for arduino with an easy API.
 
 Features
@@ -14,7 +12,7 @@ The arduino LoRaWAN library supports LoRaWAN Class A and Class C implementations
 ### What certainly works:
  - Sending packets uplink, taking into account duty cycling.
  - Custom frequencies and datarate settings.
- - Receiving downlink packets in the RX1 window (EU-868, AS-923,US-915,AU-915).
+ - Receiving downlink packets in the RX1 window (EU-868,EU-434,AS-923,US-915,AU-915).
  - Over-the-air activation (OTAA / joining) (EU-868, AS-923).
  - Class C operation.
  - Receiving downlink packets in the RX1 window (US-915).
@@ -63,10 +61,8 @@ This library is intended to be used with plain LoRa transceivers,
 connecting to them using SPI. In particular, the SX1272 and SX1276
 families are supported (which should include SX1273, SX1277, SX1278 and
 SX1279 which only differ in the available frequencies, bandwidths and
-spreading factors). It has been tested with both SX1272 and SX1276
-chips, using the Semtech SX1272 evaluation board and the HopeRF RFM92
-and RFM95 boards (which supposedly contain an SX1272 and SX1276 chip
-respectively).
+spreading factors). It has been tested with SX1272, SX1276 and SX1278
+chips.
 
 Some of the supported pre-built board currently available in the market are:
 
@@ -116,15 +112,6 @@ For example, this could look like this:
 API
 --------
 See [API.md](API.md).
-
-Tests
--------
- - See [Test Folder](test/README.md) 
-
-Maintainer
--------
-
-Beelan invests time and resources providing this open source design, please support Beelan!
 
 License
 -------
