@@ -18,8 +18,8 @@ const sRFM_pins RFM_pins = {
   .RST = 16,
   .DIO0 = 4,
   .DIO1 = 5,
-  .DIO2 = 3,
-  .DIO5 = 15,
+  .DIO2 = -1,
+  .DIO5 = -1,
 };
 
 ToIoTwithLoRaWAN t;
@@ -45,6 +45,5 @@ void setup() {
 
 void loop() {
   t.pub("sensor-uuid-1", 1,value);
-  value+=0.1;
   wdt_reset();
 }
