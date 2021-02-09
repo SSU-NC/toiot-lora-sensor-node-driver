@@ -10,21 +10,8 @@
  * please buy us a round!
  * Distributed as-is; no warranty is given.
  */
-#include <lorawan.h>
-
-// OTAA credentials
-const char *devEui = "\x00\x47\x64\xb1\xab\xc6\x4f\x7c"; //"0000000000000000";
-const char *appEui = "\x70\xb3\xd5\x7e\xf0\x00\x51\x34"; //"0000000000000000";
-const char *appKey = "\xa1\x0f\x0e\x87\x0a\x15\x58\x40\x89\x73\xc0\x60\x1e\x19\xc3\xd1"; //"00000000000000000000000000000000";
-
-
-const unsigned long interval = 10000;    // 10 s interval to send message
-unsigned long previousMillis = 0;  // will store last time message sent
-unsigned int counter = 0;     // message counter
-
-char myStr[50];
-char outStr[255];
-byte recvStatus = 0;
+#include "ToIoTwithLoRaWAN.h"
+#include "config.h"
 
 const sRFM_pins RFM_pins = {
   .CS = 15,
@@ -35,21 +22,17 @@ const sRFM_pins RFM_pins = {
   .DIO5 = 15,
 };
 
+ToIoTwithLoRaWAN t;
+double value = 0.0; 
+
 void setup() {
-  // Setup loraid access
-  Serial.begin(115200);
-  while(!Serial);
-  if(!lora.init()){
-    Serial.println("RFM95 not detected");
-    delay(5000);
-    return;
-  }
+  t.setupToIoTwithLoRaWAN(nodeId, interval);
 
   // Set LoRaWAN Class change CLASS_A or CLASS_C
   lora.setDeviceClass(CLASS_A);
 
   // Set Data Rate
-  lora.setDataRate(SF9BW125);
+  lora.setDataRate(SF8BW125);
 
   // set channel to random
   lora.setChannel(0);
@@ -65,31 +48,14 @@ void setup() {
     Serial.println("Joining...");
     isJoined = lora.join();
     
-    //wait for 10s to try again
-    delay(10000);
+    //wait for 3s to try again
+    delay(3000);
   }while(!isJoined);
   Serial.println("Joined to network");
 }
 
 void loop() {
-  // Check interval overflow
-  if(millis() - previousMillis > interval) {
-    previousMillis = millis(); 
-
-    sprintf(myStr, "Counter-%d", counter); 
-
-    Serial.print("Sending: ");
-    Serial.println(myStr);
-    
-    lora.sendUplink(myStr, strlen(myStr), 0, 1);
-    counter++;
-  }
-
-  recvStatus = lora.readData(outStr);
-  if(recvStatus) {
-    Serial.println(outStr);
-  }
-  
-  // Check Lora RX
-  lora.update();
+  t.pub("sensor-uuid-1", 1,value);
+  value+=0.1;
+  wdt_reset();
 }

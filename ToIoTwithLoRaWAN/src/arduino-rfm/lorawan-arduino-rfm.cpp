@@ -90,11 +90,13 @@ bool LoRaWANClass::init(void)
 #if defined(AS_923)
     LoRa_Settings.Datarate_Rx = 0x02;   //set to SF10 BW 125 kHz
 #elif defined(EU_868) || defined(EU_433)
-    LoRa_Settings.Datarate_Rx = 0x03;   //set to SF9 BW 125 kHz
+    //LoRa_Settings.Datarate_Rx = 0x03;   //set to SF9 BW 125 kHz
+    LoRa_Settings.Datarate_Rx = 0x04; //set tp SF8 BW 125 kHz
 #else //US_915 or AU_915
     LoRa_Settings.Datarate_Rx = 0x0C;   //set to SF8 BW 500 kHz
 #endif
-    LoRa_Settings.Channel_Rx = 0x0A;    // set to recv channel
+    //LoRa_Settings.Channel_Rx = 0x0A;    // set to recv channel
+    LoRa_Settings.Channel_Rx = 0x00;    // set to recv channel
 
     // Tx
 #if defined(US_915)
@@ -170,7 +172,7 @@ bool LoRaWANClass::join(void)
     prev_millis = millis();
     do {
         join_status = LORA_join_Accept(&Buffer_Rx, &Session_Data, &OTAA_Data, &Message_Rx, &LoRa_Settings);
-
+        Serial.println(join_status);
     }while ((millis() - prev_millis) < timeout && !join_status);
 
     return join_status;
@@ -349,6 +351,7 @@ int LoRaWANClass::readData(char *outBuff)
     //If there is new data
     if(Rx_Status == NEW_RX)
     {
+        Serial.println("Rx_Status == NEW_RX");
         res = Buffer_Rx.Counter;
         memset(outBuff, 0x00, res + 1);
         memcpy(outBuff, Buffer_Rx.Data, res);
@@ -434,6 +437,7 @@ void LoRaWANClass::randomChannel()
 #elif defined(EU_868) || defined(EU_433)
     freq_idx = random(0,7);
     LoRa_Settings.Channel_Rx=freq_idx;      // same rx and tx channel 
+    //LoRa_Settings.Channel_Rx=0x00;      // same rx and tx channel 
 #else // US_915 or AU_915
     freq_idx = random(0,8);
     LoRa_Settings.Channel_Rx = freq_idx + 0x08;

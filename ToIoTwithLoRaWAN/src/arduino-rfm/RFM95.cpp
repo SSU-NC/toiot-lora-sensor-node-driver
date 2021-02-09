@@ -290,7 +290,7 @@ static unsigned char RFM_Read(unsigned char RFM_Address)
   unsigned char RFM_Data;
 
   //Add transactions in Read and Write methods
-  SPI.beginTransaction(SPISettings(4000000,MSBFIRST,SPI_MODE0));
+  //SPI.beginTransaction(SPISettings(4000000,MSBFIRST,SPI_MODE0));
   
   //Set NSS pin low to start SPI communication
   digitalWrite(RFM_pins.CS,LOW);
@@ -538,7 +538,7 @@ bool RFM_Init()
   RFM_Write(RFM_REG_LNA,0x23);
 
   //Set RFM To datarate 0 SF12 BW 125 kHz
-  RFM_Change_Datarate(0x00);
+  RFM_Change_Datarate(0x04);
 
   //Rx Timeout set to 37 symbols
   RFM_Write(RFM_REG_SYM_TIMEOUT_LSB, 0x25);
@@ -687,31 +687,42 @@ void RFM_Send_Package(sBuffer *RFM_Tx_Package, sSettings *LoRa_Settings)
 
 message_t RFM_Single_Receive(sSettings *LoRa_Settings)
 {
+  digitalWrite(RFM_pins.DIO0, HIGH);
+
+  RFM_Switch_Mode(RFM_MODE_STANDBY);
   message_t Message_Status = NO_MESSAGE;
   
   //Change DIO 0 back to RxDone
+  //RFM_Write(RFM_REG_DIO_MAPPING1, 0x00);
   RFM_Write(RFM_REG_DIO_MAPPING1, 0x00);
-
   //Invert IQ Back
   RFM_Write(RFM_REG_INVERT_IQ, 0x67);
   RFM_Write(RFM_REG_INVERT_IQ2, 0x19);
 
   //Change Datarate
   RFM_Change_Datarate(LoRa_Settings->Datarate_Rx);
-
+  Serial.print("Datarate_Rx: ");
+  Serial.println(LoRa_Settings->Datarate_Rx);
   //Change Channel
   RFM_Change_Channel(LoRa_Settings->Channel_Rx);
+  Serial.print("Channel_Rx: ");
+  Serial.println(LoRa_Settings->Channel_Rx);
 
   //Switch RFM to Single reception
   RFM_Switch_Mode(RFM_MODE_RXSINGLE);
 
+  // DIO0 == RxDone Interrupt
+  // DIO1 == Timeout input 
   //Wait until RxDone or Timeout
   //Wait until timeout or RxDone interrupt
   while((digitalRead(RFM_pins.DIO0) == LOW) && (digitalRead(RFM_pins.DIO1) == LOW));
-
-  //Check for Timeout
-  if(digitalRead(RFM_pins.DIO1) == HIGH)
   {
+    yield();
+  }
+  //Check for Timeout
+  if((digitalRead(RFM_pins.DIO1) == HIGH) && (digitalRead(RFM_pins.DIO0) == LOW))
+  {
+    Serial.println("TIMEOUT SIGNAL FROM DIO1...");
     //Clear interrupt register
     RFM_Write(RFM_REG_IRQ_FLAGS,0xE0);
     Message_Status = TIMEOUT;
@@ -721,6 +732,7 @@ message_t RFM_Single_Receive(sSettings *LoRa_Settings)
   if(digitalRead(RFM_pins.DIO0) == HIGH)
   {
 	  Message_Status = NEW_MESSAGE;
+    Serial.println("DIO0: HIGH... NEW_MESSAGE DETECTED...");
   }
 
   return Message_Status;
@@ -750,8 +762,8 @@ void RFM_Continuous_Receive(sSettings *LoRa_Settings)
   RFM_Change_Channel(CHRX2);
 #elif defined(EU_433)
 // The RX2 receive window uses a fixed frequency and data rate. 434.665MHz / DR0 (SF12, 125 kHz).
-  RFM_Change_Datarate(SF12BW125);
-  RFM_Change_Channel(CHRX2);
+  RFM_Change_Datarate(SF8BW125); //SF12BW125
+  RFM_Change_Channel(CH0); //CHRX2
 #else
 	RFM_Change_Datarate(LoRa_Settings->Datarate_Rx);
 	RFM_Change_Channel(LoRa_Settings->Channel_Rx);
