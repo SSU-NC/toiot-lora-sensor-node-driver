@@ -44,6 +44,7 @@ void setup() {
 }
 
 void loop() {
+  Serial.print(value);
   t.pub("sensor-uuid-1", 1,value);
   wdt_reset();
 }

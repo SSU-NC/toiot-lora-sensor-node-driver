@@ -698,6 +698,7 @@ message_t RFM_Single_Receive(sSettings *LoRa_Settings)
   //RFM_Switch_Mode(RFM_MODE_STANDBY);
   message_t Message_Status = NO_MESSAGE;
   //Change DIO 0 back to RxDone
+  //RFM_Write(RFM_REG_DIO_MAPPING1, 0x00);
   RFM_Write(RFM_REG_DIO_MAPPING1, 0x00);
   //Invert IQ Back
   RFM_Write(RFM_REG_INVERT_IQ, 0x67);
@@ -709,7 +710,6 @@ message_t RFM_Single_Receive(sSettings *LoRa_Settings)
   RFM_Change_Datarate(LoRa_Settings->Datarate_Rx);
   Serial.print("Datarate_Rx: ");
   Serial.println(LoRa_Settings->Datarate_Rx);
-
   //Change Channel
   RFM_Change_Channel(LoRa_Settings->Channel_Rx);
   Serial.print("Channel_Rx: ");
@@ -724,7 +724,9 @@ message_t RFM_Single_Receive(sSettings *LoRa_Settings)
   //Wait until RxDone or Timeout
   //Wait until timeout or RxDone interrupt
   while((digitalRead(RFM_pins.DIO0) == LOW) && (digitalRead(RFM_pins.DIO1) == LOW));
-
+  {
+    yield();
+  }
   //Check for Timeout
   if((digitalRead(RFM_pins.DIO1) == HIGH) && (digitalRead(RFM_pins.DIO0) == LOW))
   {

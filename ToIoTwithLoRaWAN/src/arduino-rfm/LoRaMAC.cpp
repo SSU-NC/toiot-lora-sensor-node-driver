@@ -76,9 +76,7 @@ void LORA_Cycle(sBuffer *Data_Tx, sBuffer *Data_Rx, RFM_command_t *RFM_Command, 
 	{
     	//Lora send data
 		LORA_Send_Data(Data_Tx, Session_Data, LoRa_Settings);
-		
 		prevTime = millis();
-		
 			// Class C open RX2 immediately after sending data
 		if(LoRa_Settings->Mote_Class == 0x01)
 		{
