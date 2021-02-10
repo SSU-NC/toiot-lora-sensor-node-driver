@@ -31,6 +31,10 @@
 #include "RFM95.h"
 #include "Config.h"
 
+#ifndef ESP8266
+#define ESP8266
+#endif
+
 /**
  *  Lora Frequencies
  *    Tested on all subbands in US915 
@@ -290,7 +294,7 @@ static unsigned char RFM_Read(unsigned char RFM_Address)
   unsigned char RFM_Data;
 
   //Add transactions in Read and Write methods
-  SPI.beginTransaction(SPISettings(4000000,MSBFIRST,SPI_MODE0));
+  //SPI.beginTransaction(SPISettings(4000000,MSBFIRST,SPI_MODE0));
   
   //Set NSS pin low to start SPI communication
   digitalWrite(RFM_pins.CS,LOW);
@@ -538,7 +542,7 @@ bool RFM_Init()
   RFM_Write(RFM_REG_LNA,0x23);
 
   //Set RFM To datarate 0 SF12 BW 125 kHz
-  RFM_Change_Datarate(0x00);
+  RFM_Change_Datarate(0x04);
 
   //Rx Timeout set to 37 symbols
   RFM_Write(RFM_REG_SYM_TIMEOUT_LSB, 0x25);
@@ -629,7 +633,6 @@ void RFM_Send_Package(sBuffer *RFM_Tx_Package, sSettings *LoRa_Settings)
 
   //Set RFM in Standby mode
   RFM_Switch_Mode(RFM_MODE_STANDBY);
-
   //Switch Datarate
   RFM_Change_Datarate(LoRa_Settings->Datarate_Tx);
 
@@ -662,7 +665,12 @@ void RFM_Send_Package(sBuffer *RFM_Tx_Package, sSettings *LoRa_Settings)
   RFM_Write(RFM_REG_OP_MODE,0x83);
 
   //Wait for TxDone
-  while(digitalRead(RFM_pins.DIO0) == LOW);
+  while(digitalRead(RFM_pins.DIO0) == LOW)
+  {
+    #ifdef ESP8266
+    yield();
+    #endif
+  }
 
   //Clear interrupt
   RFM_Write(RFM_REG_IRQ_FLAGS,0x08);
@@ -687,24 +695,35 @@ void RFM_Send_Package(sBuffer *RFM_Tx_Package, sSettings *LoRa_Settings)
 
 message_t RFM_Single_Receive(sSettings *LoRa_Settings)
 {
+  //RFM_Switch_Mode(RFM_MODE_STANDBY);
   message_t Message_Status = NO_MESSAGE;
-  
   //Change DIO 0 back to RxDone
   RFM_Write(RFM_REG_DIO_MAPPING1, 0x00);
-
-  //Invert IQ Back
+  /*
+  // Enable InvertIQ
   RFM_Write(RFM_REG_INVERT_IQ, 0x67);
   RFM_Write(RFM_REG_INVERT_IQ2, 0x19);
+  */
+
+  // Disable InvertIQ
+  RFM_Write(RFM_REG_INVERT_IQ,0x27);
+  RFM_Write(RFM_REG_INVERT_IQ2,0x1D);
 
   //Change Datarate
   RFM_Change_Datarate(LoRa_Settings->Datarate_Rx);
+  Serial.print("Datarate_Rx: ");
+  Serial.println(LoRa_Settings->Datarate_Rx);
 
   //Change Channel
   RFM_Change_Channel(LoRa_Settings->Channel_Rx);
+  Serial.print("Channel_Rx: ");
+  Serial.println(LoRa_Settings->Channel_Rx);
 
   //Switch RFM to Single reception
   RFM_Switch_Mode(RFM_MODE_RXSINGLE);
 
+  // DIO0 == RxDone Interrupt
+  // DIO1 == Timeout input 
   //Wait until RxDone or Timeout
   //Wait until timeout or RxDone interrupt
   while((digitalRead(RFM_pins.DIO0) == LOW) && (digitalRead(RFM_pins.DIO1) == LOW));
@@ -715,12 +734,14 @@ message_t RFM_Single_Receive(sSettings *LoRa_Settings)
     //Clear interrupt register
     RFM_Write(RFM_REG_IRQ_FLAGS,0xE0);
     Message_Status = TIMEOUT;
+    Serial.println("TIMEOUT SIGNAL FROM DIO1...");
   }
 
   //Check for RxDone
   if(digitalRead(RFM_pins.DIO0) == HIGH)
   {
 	  Message_Status = NEW_MESSAGE;
+    Serial.println("DIO0: HIGH... NEW_MESSAGE DETECTED...");
   }
 
   return Message_Status;
@@ -739,10 +760,15 @@ void RFM_Continuous_Receive(sSettings *LoRa_Settings)
   //Change DIO 0 back to RxDone and DIO 1 to rx timeout
   RFM_Write(RFM_REG_DIO_MAPPING1,0x00);
 
-  //Invert IQ Back
+  /*
+  // Enable InvertIQ
   RFM_Write(RFM_REG_INVERT_IQ, 0x67);
   RFM_Write(RFM_REG_INVERT_IQ2, 0x19);
-  
+  */
+  // Disable InvertIQ
+  RFM_Write(RFM_REG_INVERT_IQ,0x27);
+  RFM_Write(RFM_REG_INVERT_IQ2,0x1D);
+
 	//Change Datarate and channel.
   // This depends on regional parameters
 #ifdef EU_868 
@@ -750,8 +776,8 @@ void RFM_Continuous_Receive(sSettings *LoRa_Settings)
   RFM_Change_Channel(CHRX2);
 #elif defined(EU_433)
 // The RX2 receive window uses a fixed frequency and data rate. 434.665MHz / DR0 (SF12, 125 kHz).
-  RFM_Change_Datarate(SF12BW125);
-  RFM_Change_Channel(CHRX2);
+  RFM_Change_Datarate(SF8BW125); //SF12BW125
+  RFM_Change_Channel(CH0); //CHRX2
 #else
 	RFM_Change_Datarate(LoRa_Settings->Datarate_Rx);
 	RFM_Change_Channel(LoRa_Settings->Channel_Rx);
@@ -794,6 +820,9 @@ message_t RFM_Get_Package(sBuffer *RFM_Rx_Package)
 
   RFM_Package_Location = RFM_Read(0x10); /*Read start position of received package*/
   RFM_Rx_Package->Counter = RFM_Read(0x13); /*Read length of received package*/
+  
+  Serial.print("Rx Pkg Counter: ");
+  Serial.println(RFM_Rx_Package->Counter);
 
   RFM_Write(RFM_REG_FIFO_ADDR_PTR,RFM_Package_Location); /*Set SPI pointer to start of package*/
 

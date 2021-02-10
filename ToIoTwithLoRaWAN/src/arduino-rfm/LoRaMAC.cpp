@@ -39,6 +39,9 @@
 #include "Config.h"
 #include "Arduino.h"
 
+#ifndef ESP8266
+#define ESP8266
+#endif
 /*
 *****************************************************************************************
 * FUNCTIONS
@@ -64,45 +67,48 @@
 void LORA_Cycle(sBuffer *Data_Tx, sBuffer *Data_Rx, RFM_command_t *RFM_Command, sLoRa_Session *Session_Data,
  									sLoRa_OTAA *OTAA_Data, sLoRa_Message *Message_Rx, sSettings *LoRa_Settings)
 {
-	static const unsigned int Receive_Delay_1 = 1000;
+	static const unsigned int Receive_Delay_1 = 5000;
 	static const unsigned int Receive_Delay_2 = 1000;
 	unsigned long prevTime = 0;
 
-  //Transmit
-  if(*RFM_Command == NEW_RFM_COMMAND)
-  {
-    //Lora send data
-    LORA_Send_Data(Data_Tx, Session_Data, LoRa_Settings);
-	prevTime = millis();
-		// Class C open RX2 immediately after sending data
-	if(LoRa_Settings->Mote_Class == 0x01)
+	//Transmit
+	if(*RFM_Command == NEW_RFM_COMMAND)
 	{
-	// RX2 window
-	//LoRa_Settings->Channel_Rx = Channel_Rx_2;    // set Rx2 channel
-	//LoRa_Settings->Datarate_Rx = Datarate_Rx_2;   //set data rate Rx2
-	LORA_Receive_Data(Data_Rx, Session_Data, OTAA_Data, Message_Rx, LoRa_Settings);
-	if(Data_Rx->Counter > 0) {
-		Serial.print((char *)Data_Rx->Data);
-	} else {
-		Serial.println("No Data RX2 Class C");
+    	//Lora send data
+		LORA_Send_Data(Data_Tx, Session_Data, LoRa_Settings);
+		
+		prevTime = millis();
+		
+			// Class C open RX2 immediately after sending data
+		if(LoRa_Settings->Mote_Class == 0x01)
+		{
+		// RX2 window
+		//LoRa_Settings->Channel_Rx = Channel_Rx_2;    // set Rx2 channel
+		//LoRa_Settings->Datarate_Rx = Datarate_Rx_2;   //set data rate Rx2
+			LORA_Receive_Data(Data_Rx, Session_Data, OTAA_Data, Message_Rx, LoRa_Settings);
+			if(Data_Rx->Counter > 0) {
+				Serial.print((char *)Data_Rx->Data);
+			} else {
+				Serial.println("No Data RX2 Class C");
+			}
+			
+		}
+		*RFM_Command = NO_RFM_COMMAND;
 	}
-	}
-
-    *RFM_Command = NO_RFM_COMMAND;
-  }
-
-	// wait rx1 window
-  while((digitalRead(RFM_pins.DIO0) != HIGH) && (millis() - prevTime < Receive_Delay_1))
-    {
-	#if defined(ESP8266) || defined(ESP32) 
-	yield();
-	#endif
-    };
-
-  //Get data
-  LORA_Receive_Data(Data_Rx, Session_Data, OTAA_Data, Message_Rx, LoRa_Settings);
-  *RFM_Command = NO_RFM_COMMAND;
 	
+	// wait rx1 window
+	while((digitalRead(RFM_pins.DIO0) != HIGH) && (millis() - prevTime < Receive_Delay_1))
+	{
+		#if defined(ESP8266) || defined(ESP32) 
+		yield();
+		#endif
+	};
+	
+  	//Get data
+  	LORA_Receive_Data(Data_Rx, Session_Data, OTAA_Data, Message_Rx, LoRa_Settings);
+
+  	*RFM_Command = NO_RFM_COMMAND;
+
 	if (Data_Rx->Counter==0)
 	{
 		// wait rx2 window
@@ -123,8 +129,8 @@ void LORA_Cycle(sBuffer *Data_Tx, sBuffer *Data_Rx, RFM_command_t *RFM_Command, 
 	#elif defined(EU_433)
 		unsigned char previousChannelRX=LoRa_Settings->Channel_Rx;
 		unsigned char previousDatarateRX=LoRa_Settings->Datarate_Rx;
-		LoRa_Settings->Channel_Rx=CHRX2;
-		LoRa_Settings->Datarate_Rx=SF9BW125;
+		LoRa_Settings->Channel_Rx=CH0; // CHRX2
+		LoRa_Settings->Datarate_Rx=SF8BW125; //SF9BW
 		LoRa_Settings->Channel_Rx=previousChannelRX;
 		LoRa_Settings->Datarate_Rx=previousDatarateRX;
 	#endif
@@ -181,8 +187,6 @@ void LORA_Send_Data(sBuffer *Data_Tx, sLoRa_Session *Session_Data, sSettings *Lo
   {
       Message.MAC_Header = Message.MAC_Header | 0x80;
   }
-
-
 
   //Build the Radio Package
   //Load mac header
@@ -302,19 +306,21 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
 	unsigned char Data_Location;
 
 	message_t Message_Status = NO_MESSAGE;
-
+	
 	//If it is a type A device switch RFM to single receive
 	if(LoRa_Settings->Mote_Class == CLASS_A)
 	{
-		Message_Status = RFM_Single_Receive(LoRa_Settings);  
+		Message_Status = RFM_Single_Receive(LoRa_Settings);
 	}
 	else
 	{
 		//Switch RFM to standby
 		RFM_Switch_Mode(RFM_MODE_STANDBY);
-
 		Message_Status = NEW_MESSAGE;
 	}
+	
+	Serial.print("Message Status : ");
+	Serial.println(Message_Status);
 
 	//If there is a message received get the data from the RFM
 	if(Message_Status == NEW_MESSAGE)
@@ -376,6 +382,7 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
       		else
       		{
       		  Message_Status = WRONG_MESSAGE;
+			  Serial.println("Got WRONG MESSAGE");
       		}
 
       		Address_Check = 0;
@@ -439,15 +446,15 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
 						Data_Rx->Data[i] = RFM_Data[Data_Location + i];
 					}
 
-         //Check frame port fiels. When zero it is a mac command message encrypted with NwkSKey
-         if(Message->Frame_Port == 0x00)
-         {
-          Encrypt_Payload(Data_Rx, Session_Data->NwkSKey, Message);
-         }
-         else
-         {
-          Encrypt_Payload(Data_Rx, Session_Data->AppSKey, Message);
-         }
+					//Check frame port fiels. When zero it is a mac command message encrypted with NwkSKey
+					if(Message->Frame_Port == 0x00)
+					{
+						Encrypt_Payload(Data_Rx, Session_Data->NwkSKey, Message);
+					}
+					else
+					{
+						Encrypt_Payload(Data_Rx, Session_Data->AppSKey, Message);
+					}
 
 					Message_Status = MESSAGE_DONE;
 				}
@@ -555,8 +562,10 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 	Message_Status = RFM_Single_Receive(LoRa_Settings);  
 	//If there is a message received get the data from the RFM
 	if(Message_Status == NEW_MESSAGE)
+	{
 		Message_Status = RFM_Get_Package(&RFM_Package);
-	
+		Serial.println("GOT MESSAGE!");
+	}
 	#if defined(ESP8266) || defined(ESP32) 
 	yield();
 	#endif
