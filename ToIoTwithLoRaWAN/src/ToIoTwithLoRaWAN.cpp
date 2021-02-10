@@ -76,4 +76,5 @@ void ToIoTwithLoRaWAN::pub(char* sensorId, int cnt, ...)
         Serial.print("[Recv] -----------------------------------------------------------------------");
         Serial.println(outStr);
     }
+    
 }

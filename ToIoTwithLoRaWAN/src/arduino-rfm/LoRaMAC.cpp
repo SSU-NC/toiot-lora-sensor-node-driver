@@ -67,7 +67,7 @@
 void LORA_Cycle(sBuffer *Data_Tx, sBuffer *Data_Rx, RFM_command_t *RFM_Command, sLoRa_Session *Session_Data,
  									sLoRa_OTAA *OTAA_Data, sLoRa_Message *Message_Rx, sSettings *LoRa_Settings)
 {
-	static const unsigned int Receive_Delay_1 = 1000;
+	static const unsigned int Receive_Delay_1 = 5000;
 	static const unsigned int Receive_Delay_2 = 1000;
 	unsigned long prevTime = 0;
 
@@ -76,7 +76,9 @@ void LORA_Cycle(sBuffer *Data_Tx, sBuffer *Data_Rx, RFM_command_t *RFM_Command, 
 	{
     	//Lora send data
 		LORA_Send_Data(Data_Tx, Session_Data, LoRa_Settings);
+		
 		prevTime = millis();
+		
 			// Class C open RX2 immediately after sending data
 		if(LoRa_Settings->Mote_Class == 0x01)
 		{
@@ -380,6 +382,7 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
       		else
       		{
       		  Message_Status = WRONG_MESSAGE;
+			  Serial.println("Got WRONG MESSAGE");
       		}
 
       		Address_Check = 0;

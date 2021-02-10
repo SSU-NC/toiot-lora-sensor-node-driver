@@ -698,42 +698,43 @@ message_t RFM_Single_Receive(sSettings *LoRa_Settings)
   //RFM_Switch_Mode(RFM_MODE_STANDBY);
   message_t Message_Status = NO_MESSAGE;
   //Change DIO 0 back to RxDone
-  //RFM_Write(RFM_REG_DIO_MAPPING1, 0x00);
   RFM_Write(RFM_REG_DIO_MAPPING1, 0x00);
-  //Invert IQ Back
+  /*
+  // Enable InvertIQ
   RFM_Write(RFM_REG_INVERT_IQ, 0x67);
   RFM_Write(RFM_REG_INVERT_IQ2, 0x19);
+  */
 
-   RFM_Write(RFM_REG_IRQ_FLAGS,0xE0);
+  // Disable InvertIQ
+  RFM_Write(RFM_REG_INVERT_IQ,0x27);
+  RFM_Write(RFM_REG_INVERT_IQ2,0x1D);
 
   //Change Datarate
   RFM_Change_Datarate(LoRa_Settings->Datarate_Rx);
   Serial.print("Datarate_Rx: ");
   Serial.println(LoRa_Settings->Datarate_Rx);
+
   //Change Channel
   RFM_Change_Channel(LoRa_Settings->Channel_Rx);
   Serial.print("Channel_Rx: ");
   Serial.println(LoRa_Settings->Channel_Rx);
 
   //Switch RFM to Single reception
-  RFM_Write(RFM_REG_OP_MODE,0x86);
-  //RFM_Switch_Mode(RFM_MODE_RXSINGLE);
+  RFM_Switch_Mode(RFM_MODE_RXSINGLE);
 
   // DIO0 == RxDone Interrupt
   // DIO1 == Timeout input 
   //Wait until RxDone or Timeout
   //Wait until timeout or RxDone interrupt
   while((digitalRead(RFM_pins.DIO0) == LOW) && (digitalRead(RFM_pins.DIO1) == LOW));
-  {
-    yield();
-  }
+
   //Check for Timeout
-  if((digitalRead(RFM_pins.DIO1) == HIGH) && (digitalRead(RFM_pins.DIO0) == LOW))
+  if(digitalRead(RFM_pins.DIO1) == HIGH)
   {
-    Serial.println("TIMEOUT SIGNAL FROM DIO1...");
     //Clear interrupt register
     RFM_Write(RFM_REG_IRQ_FLAGS,0xE0);
     Message_Status = TIMEOUT;
+    Serial.println("TIMEOUT SIGNAL FROM DIO1...");
   }
 
   //Check for RxDone
@@ -759,10 +760,15 @@ void RFM_Continuous_Receive(sSettings *LoRa_Settings)
   //Change DIO 0 back to RxDone and DIO 1 to rx timeout
   RFM_Write(RFM_REG_DIO_MAPPING1,0x00);
 
-  //Invert IQ Back
+  /*
+  // Enable InvertIQ
   RFM_Write(RFM_REG_INVERT_IQ, 0x67);
   RFM_Write(RFM_REG_INVERT_IQ2, 0x19);
-  
+  */
+  // Disable InvertIQ
+  RFM_Write(RFM_REG_INVERT_IQ,0x27);
+  RFM_Write(RFM_REG_INVERT_IQ2,0x1D);
+
 	//Change Datarate and channel.
   // This depends on regional parameters
 #ifdef EU_868 
