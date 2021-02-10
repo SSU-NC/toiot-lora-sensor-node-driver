@@ -106,7 +106,8 @@ typedef enum {
   CH6 = 6,
   CH7 = 7,
 #if defined(EU_868) || defined(EU_433)
-  CHRX2 = 8,
+  //CHRX2 = 8,
+  CHRX2 = 0,
 #else
   CH8 = 8,
 #endif

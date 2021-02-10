@@ -25,13 +25,25 @@ void setup() {
   // set channel to random
   lora.setChannel(0);
   
-  // Put ABP Key and DevAddress here
-  lora.setNwkSKey(nwkSKey);
-  lora.setAppSKey(appSKey);
-  lora.setDevAddr(devAddr);
+  // Put OTAA Key and DevAddress here
+  lora.setDevEUI(devEui);
+  lora.setAppEUI(appEui);
+  lora.setAppKey(appKey);
+
+  // Join procedure
+  bool isJoined;
+  do {
+    Serial.println("Joining...");
+    isJoined = lora.join();
+    
+    //wait for 3s to try again
+    delay(3000);
+  }while(!isJoined);
+  Serial.println("Joined to network");
 }
 
 void loop() {
   t.pub("sensor-uuid-1", 1,value);
+  value+=0.1;
   wdt_reset();
 }
