@@ -35,6 +35,8 @@
 #include "Encrypt.h"
 #include "AES-128.h"
 #include "Struct.h"
+#include <Arduino.h>
+
 
 /*
 *****************************************************************************************
@@ -100,8 +102,8 @@ void Encrypt_Payload(sBuffer *Buffer, unsigned char *Key, sLoRa_Message *Message
 
 	unsigned char Block_A[16];
 
-	//Calculate number of blocks
 	Number_of_Blocks = Buffer->Counter / 16;
+
 	Incomplete_Block_Size = Buffer->Counter % 16;
 	if(Incomplete_Block_Size != 0)
 	{
@@ -117,12 +119,12 @@ void Encrypt_Payload(sBuffer *Buffer, unsigned char *Key, sLoRa_Message *Message
 		Block_A[4] = 0x00;
 
 		Block_A[5] = Message->Direction;
-
+		
 		Block_A[6] = Message->DevAddr[3];
 		Block_A[7] = Message->DevAddr[2];
 		Block_A[8] = Message->DevAddr[1];
 		Block_A[9] = Message->DevAddr[0];
-
+		
 		Block_A[10] = (Message->Frame_Counter & 0x00FF);
 		Block_A[11] = ((Message->Frame_Counter >> 8) & 0x00FF);
 
@@ -135,13 +137,15 @@ void Encrypt_Payload(sBuffer *Buffer, unsigned char *Key, sLoRa_Message *Message
 
 		//Calculate S
 		AES_Encrypt(Block_A,Key);
-
+		
 		//Check for last block
+		Serial.print("S: ");
 		if(i != (Number_of_Blocks - 1))
 		{
 			for(j = 0; j < 16; j++)
 			{
 				Buffer->Data[(i*16)+j] ^= Block_A[j];
+				Serial.print(Block_A[j]); Serial.print("|");
 			}
 		}
 		else
@@ -153,8 +157,10 @@ void Encrypt_Payload(sBuffer *Buffer, unsigned char *Key, sLoRa_Message *Message
 			for(j = 0; j < Incomplete_Block_Size; j++)
 			{
 				Buffer->Data[(i*16)+j] ^= Block_A[j];
+				Serial.print(Block_A[j]); Serial.print("|");
 			}
 		}
+		Serial.println();
 	}
 }
 

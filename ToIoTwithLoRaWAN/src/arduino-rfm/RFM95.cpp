@@ -812,6 +812,7 @@ message_t RFM_Get_Package(sBuffer *RFM_Rx_Package)
   if((RFM_Interrupts & 0x20) != 0x20)
   {
 	  Message_Status = CRC_OK;
+    Serial.println("Got CRC_OK From RFM_Get_Package...");
   }
   else
   {
@@ -821,7 +822,7 @@ message_t RFM_Get_Package(sBuffer *RFM_Rx_Package)
   RFM_Package_Location = RFM_Read(0x10); /*Read start position of received package*/
   RFM_Rx_Package->Counter = RFM_Read(0x13); /*Read length of received package*/
   
-  Serial.print("Rx Pkg Counter: ");
+  Serial.print("Rx Pkg Size: ");
   Serial.println(RFM_Rx_Package->Counter);
 
   RFM_Write(RFM_REG_FIFO_ADDR_PTR,RFM_Package_Location); /*Set SPI pointer to start of package*/
@@ -829,7 +830,10 @@ message_t RFM_Get_Package(sBuffer *RFM_Rx_Package)
   for (i = 0x00; i < RFM_Rx_Package->Counter; i++)
   {
     RFM_Rx_Package->Data[i] = RFM_Read(RFM_REG_FIFO);
+    Serial.print(RFM_Rx_Package->Data[i]);
+    Serial.print("|");
   }
+  Serial.println();
 
   //Clear interrupt register
   RFM_Write(RFM_REG_IRQ_FLAGS,0xE0);

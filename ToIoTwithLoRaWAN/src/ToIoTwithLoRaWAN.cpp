@@ -55,25 +55,13 @@ void ToIoTwithLoRaWAN::pub(char* sensorId, int cnt, ...)
         Serial.print("[Pub] ");
         Serial.println(msg);
         uplink_counter++;
-
-    /*
-                // Check Lora RX
-            // Should be a reply message for us now   
-            if (rf95->recv(outStr, (uint8_t*)250))
-            {
-                Serial.print("got reply: ");
-                Serial.println((char*)outStr);
-                //      Serial.print("RSSI: ");
-                //      Serial.println(rf95.lastRssi(), DEC);    
-            }
-    */
     }
     
     lora.update();
 
     recvStatus = lora.readData(outStr);
     if(recvStatus) {
-        Serial.print("[Recv] -----------------------------------------------------------------------");
+        Serial.print("[Recv] ");
         Serial.println(outStr);
     }
     
