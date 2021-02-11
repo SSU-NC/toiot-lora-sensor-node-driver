@@ -1,30 +1,3 @@
-/******************************************************************************************
-* Copyright 2017 Ideetron B.V.
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU Lesser General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
-******************************************************************************************/
-/****************************************************************************************
-* File:     Encrypt.cpp
-* Author:   Gerben den Hartog
-* Compagny: Ideetron B.V.
-* Website:  http://www.ideetron.nl/LoRa
-* E-mail:   info@ideetron.nl
-****************************************************************************************/
-/****************************************************************************************
-* Created on:         09-02-2017
-* Supported Hardware: ID150119-02 Nexus board with RFM95
-****************************************************************************************/
 
 /*
 *****************************************************************************************
@@ -35,6 +8,8 @@
 #include "Encrypt.h"
 #include "AES-128.h"
 #include "Struct.h"
+#include <Arduino.h>
+
 
 /*
 *****************************************************************************************
@@ -100,8 +75,8 @@ void Encrypt_Payload(sBuffer *Buffer, unsigned char *Key, sLoRa_Message *Message
 
 	unsigned char Block_A[16];
 
-	//Calculate number of blocks
 	Number_of_Blocks = Buffer->Counter / 16;
+
 	Incomplete_Block_Size = Buffer->Counter % 16;
 	if(Incomplete_Block_Size != 0)
 	{
@@ -117,31 +92,32 @@ void Encrypt_Payload(sBuffer *Buffer, unsigned char *Key, sLoRa_Message *Message
 		Block_A[4] = 0x00;
 
 		Block_A[5] = Message->Direction;
-
+		
 		Block_A[6] = Message->DevAddr[3];
 		Block_A[7] = Message->DevAddr[2];
 		Block_A[8] = Message->DevAddr[1];
 		Block_A[9] = Message->DevAddr[0];
-
+		
 		Block_A[10] = (Message->Frame_Counter & 0x00FF);
 		Block_A[11] = ((Message->Frame_Counter >> 8) & 0x00FF);
-
 		Block_A[12] = 0x00; //Frame counter upper Bytes
 		Block_A[13] = 0x00;
-
+		
 		Block_A[14] = 0x00;
 
 		Block_A[15] = i + 1;
 
 		//Calculate S
 		AES_Encrypt(Block_A,Key);
-
+		
 		//Check for last block
+		Serial.print("S: ");
 		if(i != (Number_of_Blocks - 1))
 		{
 			for(j = 0; j < 16; j++)
 			{
 				Buffer->Data[(i*16)+j] ^= Block_A[j];
+				Serial.print(Block_A[j]); Serial.print("|");
 			}
 		}
 		else
@@ -153,8 +129,10 @@ void Encrypt_Payload(sBuffer *Buffer, unsigned char *Key, sLoRa_Message *Message
 			for(j = 0; j < Incomplete_Block_Size; j++)
 			{
 				Buffer->Data[(i*16)+j] ^= Block_A[j];
+				Serial.print(Block_A[j]); Serial.print("|");
 			}
 		}
+		Serial.println();
 	}
 }
 
