@@ -652,6 +652,10 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 #endif	
 				joinStatus = true;
 			}
+			else if(Message_Status == WRONG_MESSAGE){
+				Serial.println("WRONG_MESSAGE...");
+			}
+
 		}
 	}
 	return joinStatus;

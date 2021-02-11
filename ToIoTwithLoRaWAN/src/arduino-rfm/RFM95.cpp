@@ -699,16 +699,15 @@ message_t RFM_Single_Receive(sSettings *LoRa_Settings)
   message_t Message_Status = NO_MESSAGE;
   //Change DIO 0 back to RxDone
   RFM_Write(RFM_REG_DIO_MAPPING1, 0x00);
-  /*
+  
   // Enable InvertIQ
-  RFM_Write(RFM_REG_INVERT_IQ, 0x67);
+  RFM_Write(RFM_REG_INVERT_IQ, 0x66); //0x67
   RFM_Write(RFM_REG_INVERT_IQ2, 0x19);
-  */
-
+  /*
   // Disable InvertIQ
   RFM_Write(RFM_REG_INVERT_IQ,0x27);
   RFM_Write(RFM_REG_INVERT_IQ2,0x1D);
-
+  */
   //Change Datarate
   RFM_Change_Datarate(LoRa_Settings->Datarate_Rx);
   Serial.print("Datarate_Rx: ");
@@ -760,15 +759,14 @@ void RFM_Continuous_Receive(sSettings *LoRa_Settings)
   //Change DIO 0 back to RxDone and DIO 1 to rx timeout
   RFM_Write(RFM_REG_DIO_MAPPING1,0x00);
 
-  /*
   // Enable InvertIQ
-  RFM_Write(RFM_REG_INVERT_IQ, 0x67);
+  RFM_Write(RFM_REG_INVERT_IQ, 0x66); //0x67
   RFM_Write(RFM_REG_INVERT_IQ2, 0x19);
-  */
+ /*
   // Disable InvertIQ
   RFM_Write(RFM_REG_INVERT_IQ,0x27);
   RFM_Write(RFM_REG_INVERT_IQ2,0x1D);
-
+*/
 	//Change Datarate and channel.
   // This depends on regional parameters
 #ifdef EU_868 
