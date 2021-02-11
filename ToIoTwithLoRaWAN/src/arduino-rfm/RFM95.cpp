@@ -699,16 +699,15 @@ message_t RFM_Single_Receive(sSettings *LoRa_Settings)
   message_t Message_Status = NO_MESSAGE;
   //Change DIO 0 back to RxDone
   RFM_Write(RFM_REG_DIO_MAPPING1, 0x00);
-  /*
+  
   // Enable InvertIQ
-  RFM_Write(RFM_REG_INVERT_IQ, 0x67);
+  RFM_Write(RFM_REG_INVERT_IQ, 0x66); //0x67
   RFM_Write(RFM_REG_INVERT_IQ2, 0x19);
-  */
-
+  /*
   // Disable InvertIQ
   RFM_Write(RFM_REG_INVERT_IQ,0x27);
   RFM_Write(RFM_REG_INVERT_IQ2,0x1D);
-
+  */
   //Change Datarate
   RFM_Change_Datarate(LoRa_Settings->Datarate_Rx);
   Serial.print("Datarate_Rx: ");
@@ -760,15 +759,14 @@ void RFM_Continuous_Receive(sSettings *LoRa_Settings)
   //Change DIO 0 back to RxDone and DIO 1 to rx timeout
   RFM_Write(RFM_REG_DIO_MAPPING1,0x00);
 
-  /*
   // Enable InvertIQ
-  RFM_Write(RFM_REG_INVERT_IQ, 0x67);
+  RFM_Write(RFM_REG_INVERT_IQ, 0x66); //0x67
   RFM_Write(RFM_REG_INVERT_IQ2, 0x19);
-  */
+ /*
   // Disable InvertIQ
   RFM_Write(RFM_REG_INVERT_IQ,0x27);
   RFM_Write(RFM_REG_INVERT_IQ2,0x1D);
-
+*/
 	//Change Datarate and channel.
   // This depends on regional parameters
 #ifdef EU_868 
@@ -812,6 +810,7 @@ message_t RFM_Get_Package(sBuffer *RFM_Rx_Package)
   if((RFM_Interrupts & 0x20) != 0x20)
   {
 	  Message_Status = CRC_OK;
+    Serial.println("Got CRC_OK From RFM_Get_Package...");
   }
   else
   {
@@ -821,7 +820,7 @@ message_t RFM_Get_Package(sBuffer *RFM_Rx_Package)
   RFM_Package_Location = RFM_Read(0x10); /*Read start position of received package*/
   RFM_Rx_Package->Counter = RFM_Read(0x13); /*Read length of received package*/
   
-  Serial.print("Rx Pkg Counter: ");
+  Serial.print("Rx Pkg Size: ");
   Serial.println(RFM_Rx_Package->Counter);
 
   RFM_Write(RFM_REG_FIFO_ADDR_PTR,RFM_Package_Location); /*Set SPI pointer to start of package*/
@@ -829,7 +828,10 @@ message_t RFM_Get_Package(sBuffer *RFM_Rx_Package)
   for (i = 0x00; i < RFM_Rx_Package->Counter; i++)
   {
     RFM_Rx_Package->Data[i] = RFM_Read(RFM_REG_FIFO);
+    Serial.print(RFM_Rx_Package->Data[i]);
+    Serial.print("|");
   }
+  Serial.println();
 
   //Clear interrupt register
   RFM_Write(RFM_REG_IRQ_FLAGS,0xE0);

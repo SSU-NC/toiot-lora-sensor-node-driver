@@ -1,29 +1,3 @@
-/******************************************************************************************
-* Copyright 2017 Ideetron B.V.
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU Lesser General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
-******************************************************************************************/
-/****************************************************************************************
-* File:     LoRaMAC.cpp
-* Author:   Gerben den Hartog
-* Compagny: Ideetron B.V.
-* Website:  http://www.ideetron.nl/LoRa
-* E-mail:   info@ideetron.nl
-****************************************************************************************/
-/****************************************************************************************
-* Created on:         06-01-2017
-****************************************************************************************/
 /*
 *****************************************************************************************
 * INCLUDE FILES
@@ -87,7 +61,7 @@ void LORA_Cycle(sBuffer *Data_Tx, sBuffer *Data_Rx, RFM_command_t *RFM_Command, 
 		//LoRa_Settings->Datarate_Rx = Datarate_Rx_2;   //set data rate Rx2
 			LORA_Receive_Data(Data_Rx, Session_Data, OTAA_Data, Message_Rx, LoRa_Settings);
 			if(Data_Rx->Counter > 0) {
-				Serial.print((char *)Data_Rx->Data);
+				Serial.print((char *)(Data_Rx->Data));
 			} else {
 				Serial.println("No Data RX2 Class C");
 			}
@@ -318,9 +292,6 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
 		RFM_Switch_Mode(RFM_MODE_STANDBY);
 		Message_Status = NEW_MESSAGE;
 	}
-	
-	Serial.print("Message Status : ");
-	Serial.println(Message_Status);
 
 	//If there is a message received get the data from the RFM
 	if(Message_Status == NEW_MESSAGE)
@@ -364,10 +335,13 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
 			Construct_Data_MIC(&RFM_Package, Session_Data, Message);
 
 			MIC_Check = 0x00;
-
             //Compare MIC
 			for(i = 0x00; i < 4; i++)
 			{
+				Serial.print("MIC Check "); Serial.print(i); Serial.print(": ");
+				Serial.print(RFM_Data[RFM_Package.Counter + i]);
+				Serial.print(",");
+				Serial.println(Message->MIC[i]);
 				if(RFM_Data[RFM_Package.Counter + i] == Message->MIC[i])
 				{
 					MIC_Check++;
@@ -382,7 +356,7 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
       		else
       		{
       		  Message_Status = WRONG_MESSAGE;
-			  Serial.println("Got WRONG MESSAGE");
+			  Serial.println("Invalid MIC");
       		}
 
       		Address_Check = 0;
@@ -441,10 +415,14 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
 				//Copy and decrypt the data
 				if(Data_Rx->Counter != 0x00)
 				{
+					Serial.print("Decrypt target: ");
 					for(i = 0; i < Data_Rx->Counter; i++)
 					{
 						Data_Rx->Data[i] = RFM_Data[Data_Location + i];
+						Serial.print(Data_Rx->Data[i]);
+						Serial.print("|");
 					}
+					Serial.println();
 
 					//Check frame port fiels. When zero it is a mac command message encrypted with NwkSKey
 					if(Message->Frame_Port == 0x00)
@@ -463,6 +441,7 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
 
 		if(Message_Status == WRONG_MESSAGE)
 		{
+			Serial.println("ERROR: WRONG_MESSAGE");
 			Data_Rx->Counter = 0x00;
  		}
 	}
@@ -673,6 +652,10 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 #endif	
 				joinStatus = true;
 			}
+			else if(Message_Status == WRONG_MESSAGE){
+				Serial.println("WRONG_MESSAGE...");
+			}
+
 		}
 	}
 	return joinStatus;

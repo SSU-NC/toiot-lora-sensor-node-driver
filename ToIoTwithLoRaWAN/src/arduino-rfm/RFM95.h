@@ -74,7 +74,7 @@ typedef enum {
     RFM_REG_MODEM_CONFIG3   = 0x26, 
     RFM_REG_INVERT_IQ       = 0x33,
     RFM_REG_INVERT_IQ2      = 0x3b,
-    RFM_REG_SYNC_WORD       = 0x34,
+    RFM_REG_SYNC_WORD       = 0x39,
     RFM_REG_DIO_MAPPING1    = 0x40,
     RFM_REG_DIO_MAPPING2    = 0x41,
     RFM_REG_PA_DAC          = 0x4d
