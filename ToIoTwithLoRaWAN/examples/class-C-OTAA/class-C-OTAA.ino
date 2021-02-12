@@ -44,6 +44,5 @@ void setup() {
 
 void loop() {
   t.pub("sensor-uuid-1", 1,value);
-  value+=0.1;
   wdt_reset();
 }

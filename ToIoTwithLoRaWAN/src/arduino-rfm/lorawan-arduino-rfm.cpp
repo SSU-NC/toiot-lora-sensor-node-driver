@@ -1,10 +1,4 @@
 /*
-    loraid-arduino-rfm.cpp
-    Copyright © 2018 lora.id. All right reserved.
-
-    Author: Andri Rahmadhani
-    Date: 2018-04-25
-
     Encapsulate Ideetron LoRaWAN simple node demonstrator
     *This fimrware supports
         *Over The Air Activation
@@ -381,6 +375,7 @@ bool LoRaWANClass::readAck(void)
 
 void LoRaWANClass::update(void)
 {
+
     //Type A mote transmit receive cycle
     if((RFM_Command_Status == NEW_RFM_COMMAND || RFM_Command_Status == JOIN) && LoRa_Settings.Mote_Class == CLASS_A)
     {
