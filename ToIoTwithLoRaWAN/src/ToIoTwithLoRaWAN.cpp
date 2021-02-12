@@ -6,11 +6,6 @@ ToIoTwithLoRaWAN::ToIoTwithLoRaWAN()
 
 void ToIoTwithLoRaWAN::setupToIoTwithLoRaWAN(char* nodeI, const unsigned long intertimer)
 {
-    //rf95 = new RH_RF95(15,4);
-    //rf95->init();//
-    //rf95->setFrequency(433.175); //
-    //rf95->setSpreadingFactor(8);//
-
     Serial.begin(115200);
     if(!lora.init()){
         Serial.println("RFM95 not detected");
