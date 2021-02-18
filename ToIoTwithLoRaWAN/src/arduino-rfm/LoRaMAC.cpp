@@ -16,6 +16,8 @@
 #ifndef ESP8266
 #define ESP8266
 #endif
+//#define DEBUG
+
 /*
 *****************************************************************************************
 * FUNCTIONS
@@ -213,7 +215,7 @@ void LORA_Send_Data(sBuffer *Data_Tx, sLoRa_Session *Session_Data, sSettings *Lo
   }
 
   //Send Package
-
+#ifdef DEBUG
   unsigned char filter = 0x80;
   Serial.print("MHDR: ");
   for (int i=0; i<8; i++){
@@ -222,6 +224,7 @@ void LORA_Send_Data(sBuffer *Data_Tx, sLoRa_Session *Session_Data, sSettings *Lo
 	  filter = filter >> 1;
   }
   Serial.println();
+#endif
 
   RFM_Send_Package(&RFM_Package, LoRa_Settings);
 
@@ -338,10 +341,12 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
             //Compare MIC
 			for(i = 0x00; i < 4; i++)
 			{
+#ifdef DEBUG
 				Serial.print("MIC Check "); Serial.print(i); Serial.print(": ");
 				Serial.print(RFM_Data[RFM_Package.Counter + i]);
 				Serial.print(",");
 				Serial.println(Message->MIC[i]);
+#endif
 				if(RFM_Data[RFM_Package.Counter + i] == Message->MIC[i])
 				{
 					MIC_Check++;
@@ -356,7 +361,7 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
       		else
       		{
       		  Message_Status = WRONG_MESSAGE;
-			  Serial.println("Invalid MIC");
+			  Serial.println("Invalid MIC...");
       		}
 
       		Address_Check = 0;
@@ -364,13 +369,13 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
       		//Check address
       		if(MIC_Check == 0x04)
       		{
-			      for(i = 0x00; i < 4; i++)
-			      {
-			        if(Session_Data->DevAddr[i] == Message->DevAddr[i])
-			        {
-				        Address_Check++;
-			        }
-			      }
+			    for(i = 0x00; i < 4; i++)
+			    {
+					if(Session_Data->DevAddr[i] == Message->DevAddr[i])
+					{
+						Address_Check++;
+					}
+			    }
       		}
 
 		  	if(Address_Check == 0x04)
@@ -380,6 +385,7 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
 		  	else
 		  	{
 				Message_Status = WRONG_MESSAGE;
+				Serial.println("Wrong DevAddr...");
 		  	}
 
 			//if the address is OK then decrypt the data
@@ -441,7 +447,7 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
 
 		if(Message_Status == WRONG_MESSAGE)
 		{
-			Serial.println("ERROR: WRONG_MESSAGE");
+			Serial.println("WRONG_MESSAGE...");
 			Data_Rx->Counter = 0x00;
  		}
 	}
@@ -558,6 +564,7 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 		//Join Accept message
 		if(Message->MAC_Header == 0x20)
 		{	
+			Serial.println("MType: Join Accept");
 			//Copy the data into the data array
 			for(i = 0x00; i < RFM_Package.Counter; i++)
 				Data_Rx->Data[i] = RFM_Package.Data[i];
@@ -569,21 +576,36 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 			for(i = 0x00; i < ((Data_Rx->Counter - 1) / 16); i++)
 				AES_Encrypt(&(Data_Rx->Data[(i*16)+1]),OTAA_Data->AppKey);
 
+#ifdef DEBUG
+			Serial.print("Decrypted: ");
+			for(i = 0x00; i < Data_Rx->Counter; i++)
+			{
+				Serial.print(Data_Rx->Data[i]); Serial.print("|");
+			}
+			Serial.println();
+#endif
+
 			//Calculate MIC
 			//Remove MIC from number of bytes
-			Data_Rx->Counter -= 4;
+			Data_Rx->Counter -= 4; //
 
 			//Get MIC
 			Calculate_MIC(Data_Rx, OTAA_Data->AppKey, Message);
 
 			//Clear MIC check counter
 			MIC_Check = 0x00;
-
 			//Compare MIC
 			for(i = 0x00; i < 4; i++)
+			{
+#ifdef DEBUG
+				Serial.print("MIC Check "); Serial.print(i); Serial.print(": ");
+				Serial.print(Data_Rx->Data[Data_Rx->Counter + i]);
+				Serial.print(",");
+				Serial.println(Message->MIC[i]);
+#endif
 				if(Data_Rx->Data[Data_Rx->Counter + i] == Message->MIC[i])
 					MIC_Check++;
-
+			}
 			//Check if MIC compares
 			if(MIC_Check == 0x04)
 				Message_Status = MIC_OK;
@@ -644,10 +666,10 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 #ifdef DEBUG
 				Serial.print(F("NwkSKey: "));
 				for(byte i = 0; i < 16 ;++i)
-					Serial.print(Session_Data->NwkSKey[i],HEX);
+					Serial.print(Session_Data->NwkSKey[i], HEX);
 				Serial.print(F("\nAppSKey: "));
 				for(byte i = 0; i < 16 ;++i)
-					Serial.print(Session_Data->AppSKey[i],HEX);
+					Serial.print(Session_Data->AppSKey[i], HEX);
 				Serial.println();
 #endif	
 				joinStatus = true;

@@ -4,13 +4,8 @@ ToIoTwithLoRaWAN::ToIoTwithLoRaWAN()
 {
 }
 
-void ToIoTwithLoRaWAN::setupToIoTwithLoRaWAN(char* nodeI, const unsigned long intertimer)
+void ToIoTwithLoRaWAN::setupToIoTwithLoRaWAN(char* nodeI, const unsigned long intertimer, unsigned int qos)
 {
-    //rf95 = new RH_RF95(15,4);
-    //rf95->init();//
-    //rf95->setFrequency(433.175); //
-    //rf95->setSpreadingFactor(8);//
-
     Serial.begin(115200);
     if(!lora.init()){
         Serial.println("RFM95 not detected");
@@ -19,19 +14,18 @@ void ToIoTwithLoRaWAN::setupToIoTwithLoRaWAN(char* nodeI, const unsigned long in
     }
     nodeId = nodeI;
     interval = intertimer;
+    QOS = qos;
+    sender_lock = false;
     snprintf(topic, 26, "data/%s", nodeId);
 }
 
 void ToIoTwithLoRaWAN::pub(char* sensorId, int cnt, ...)
 {
-    // todo: connection check
-    
+
     if(millis() - previousMillis > interval) {
         va_list ap;
         va_start(ap, cnt);
-        //uint8_t res = 0;
         memset(msg, 0, 50);
-        //res = sprintf(msg, "%s:%s,", topic, sensorId);
         sprintf(msg, "%s:%s,",topic,sensorId);
 
         for(int i=0; i<cnt; i++)
@@ -39,22 +33,36 @@ void ToIoTwithLoRaWAN::pub(char* sensorId, int cnt, ...)
             arg = va_arg(ap, double);
             if(i == cnt-1)
             {
-                //res += vsprintf(msg+res, "%lf", ap);
                 sprintf(msg, "%s%lf",msg,arg);
             }
             else
             {
-                //res += vsprintf(msg+res, "%lf,", ap);
                 sprintf(msg, "%s%lf,",msg,arg);
             }
         }
         va_end(ap);
 
         previousMillis = millis(); 
-        lora.sendUplink(msg, strlen(msg), 0, 1);
-        Serial.print("[Pub] ");
-        Serial.println(msg);
-        uplink_counter++;
+        if(QOS){
+            if ((uplink_counter > 0) && !sender_lock){
+                lora.sendUplink(msg, strlen(msg), 1, 1);
+                Serial.print("[Pub] ");
+                Serial.println(msg);
+            }
+            else if(uplink_counter == 0){
+                lora.sendUplink(msg, strlen(msg), 1, 1);
+                Serial.print("[Pub] ");
+                Serial.println(msg);
+            }
+            sender_lock = true;
+        }
+        else{
+            lora.sendUplink(msg, strlen(msg), 0, 1);
+            Serial.print("[Pub] ");
+            Serial.println(msg);
+            uplink_counter++;
+        }
+        
     }
     
     lora.update();
@@ -63,6 +71,11 @@ void ToIoTwithLoRaWAN::pub(char* sensorId, int cnt, ...)
     if(recvStatus) {
         Serial.print("[Recv] ");
         Serial.println(outStr);
+        if(QOS && lora.readAck()){
+            Serial.println("ACK received!!");
+            sender_lock = false;
+            uplink_counter++;
+        }
     }
     
 }

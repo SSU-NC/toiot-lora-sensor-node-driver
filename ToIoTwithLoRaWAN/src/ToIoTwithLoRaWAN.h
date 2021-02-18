@@ -8,7 +8,7 @@ class ToIoTwithLoRaWAN
 {
     public:
         ToIoTwithLoRaWAN();
-        void setupToIoTwithLoRaWAN(char* nodeI, const unsigned long intertimer);
+        void setupToIoTwithLoRaWAN(char* nodeI, const unsigned long intertimer, unsigned int QOS);
         void pub(char* sensorId, int cnt, ...);
     private:
         char topic[26];
@@ -23,6 +23,9 @@ class ToIoTwithLoRaWAN
         unsigned long previousMillis = 0;  // will store last time message sent
         unsigned int uplink_counter = 0;     // message counter
         //RH_RF95* rf95;
+
+        unsigned int QOS;
+        bool sender_lock;
 };
 
 #endif
