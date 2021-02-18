@@ -369,13 +369,13 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
       		//Check address
       		if(MIC_Check == 0x04)
       		{
-			      for(i = 0x00; i < 4; i++)
-			      {
-			        if(Session_Data->DevAddr[i] == Message->DevAddr[i])
-			        {
-				        Address_Check++;
-			        }
-			      }
+			    for(i = 0x00; i < 4; i++)
+			    {
+					if(Session_Data->DevAddr[i] == Message->DevAddr[i])
+					{
+						Address_Check++;
+					}
+			    }
       		}
 
 		  	if(Address_Check == 0x04)
@@ -385,6 +385,7 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
 		  	else
 		  	{
 				Message_Status = WRONG_MESSAGE;
+				Serial.println("Wrong DevAddr...");
 		  	}
 
 			//if the address is OK then decrypt the data
