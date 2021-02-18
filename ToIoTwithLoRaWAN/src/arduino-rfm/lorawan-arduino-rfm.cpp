@@ -382,11 +382,10 @@ void LoRaWANClass::update(void)
       //LoRa cycle
       LORA_Cycle(&Buffer_Tx, &Buffer_Rx, &RFM_Command_Status, &Session_Data, &OTAA_Data, &Message_Rx, &LoRa_Settings);
 
-      if ((Message_Rx.Frame_Control & 0x20) > 0)
+      if ((Message_Rx.Frame_Control & 0x20) > 0){
         Ack_Status = NEW_ACK;
-
-      if(Buffer_Rx.Counter != 0x00)
-      {
+      }
+      if(Buffer_Rx.Counter != 0x00){
         Rx_Status = NEW_RX;
       }
       
@@ -398,7 +397,7 @@ void LoRaWANClass::update(void)
     {
        //Transmit
       if(RFM_Command_Status == NEW_RFM_COMMAND)
-      {     
+      {
         //Lora send data
         LORA_Send_Data(&Buffer_Tx, &Session_Data, &LoRa_Settings);
 
@@ -410,7 +409,10 @@ void LoRaWANClass::update(void)
       {
         //Get data
         LORA_Receive_Data(&Buffer_Rx, &Session_Data, &OTAA_Data, &Message_Rx, &LoRa_Settings);
-
+        // Check - ACK
+        if ((Message_Rx.Frame_Control & 0x20) > 0){
+            Ack_Status = NEW_ACK;
+        }
         if(Buffer_Rx.Counter != 0x00)
         {
             Rx_Status = NEW_RX;

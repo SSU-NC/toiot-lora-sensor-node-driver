@@ -14,7 +14,7 @@ ToIoTwithLoRaWAN t;
 double value = 0.0; 
 
 void setup() {
-  t.setupToIoTwithLoRaWAN(nodeId, interval);
+  t.setupToIoTwithLoRaWAN(nodeId, interval, 0);
 
   // Set LoRaWAN Class change CLASS_A or CLASS_C
   lora.setDeviceClass(CLASS_C);
