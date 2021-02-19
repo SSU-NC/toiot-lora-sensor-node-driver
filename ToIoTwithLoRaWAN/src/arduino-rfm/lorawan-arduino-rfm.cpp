@@ -373,14 +373,34 @@ bool LoRaWANClass::readAck(void)
     return false;
 }
 
+bool LoRaWANClass::readMac(void){
+    if (Rx_Mac_Command_Status == NEW_MAC_COMMAND_FRMPayload){
+        Rx_Mac_Command_Status = NO_MAC_COMMAND;
+        return true;
+    }
+    return false;
+}
+
+int LoRaWANClass::get_pkt_snr(void)
+{
+    unsigned char snr;
+    snr = RFM_Read(RFM_REG_PKT_SNR_VALUE);
+    return (snr & 0xFF)>>2;
+    /*if(snr & 0x80 != 0){
+        return -1 * (((~snr + 1) & 0xFF) >> 2);
+    }
+    else{
+        return (snr & 0xFF)>>2;
+    }*/
+}
+
 void LoRaWANClass::update(void)
 {
-
     //Type A mote transmit receive cycle
     if((RFM_Command_Status == NEW_RFM_COMMAND || RFM_Command_Status == JOIN) && LoRa_Settings.Mote_Class == CLASS_A)
     {
       //LoRa cycle
-      LORA_Cycle(&Buffer_Tx, &Buffer_Rx, &RFM_Command_Status, &Session_Data, &OTAA_Data, &Message_Rx, &LoRa_Settings);
+      LORA_Cycle(&Buffer_Tx, &Buffer_Rx, &RFM_Command_Status, &Session_Data, &OTAA_Data, &Message_Tx, &Message_Rx, &LoRa_Settings);
 
       if ((Message_Rx.Frame_Control & 0x20) > 0){
         Ack_Status = NEW_ACK;
@@ -388,7 +408,6 @@ void LoRaWANClass::update(void)
       if(Buffer_Rx.Counter != 0x00){
         Rx_Status = NEW_RX;
       }
-      
       RFM_Command_Status = NO_RFM_COMMAND;
     }
 
@@ -399,7 +418,7 @@ void LoRaWANClass::update(void)
       if(RFM_Command_Status == NEW_RFM_COMMAND)
       {
         //Lora send data
-        LORA_Send_Data(&Buffer_Tx, &Session_Data, &LoRa_Settings);
+        LORA_Send_Data(&Buffer_Tx, &Session_Data, &Message_Tx, &LoRa_Settings);
 
         RFM_Command_Status = NO_RFM_COMMAND;
       }
@@ -416,6 +435,9 @@ void LoRaWANClass::update(void)
         if(Buffer_Rx.Counter != 0x00)
         {
             Rx_Status = NEW_RX;
+        }
+        if (Message_Rx.Frame_Port == 0){
+            Rx_Mac_Command_Status = NEW_MAC_COMMAND_FRMPayload;
         }
       }
       RFM_Command_Status = NO_RFM_COMMAND;
@@ -441,6 +463,29 @@ void LoRaWANClass::randomChannel()
     LoRa_Settings.Channel_Tx = freq_idx;
 }
 
+
+
+int LoRaWANClass::handle_mac_cmd_req(unsigned char cid, unsigned int *uplink_counter)
+{
+    switch (cid)
+    {
+    case DevStatusReq:
+        char data[15];
+        data[0] = DevStatusAns;
+        data[1] = 255;
+        data[1] = get_pkt_snr();
+        Message_Tx.Frame_Port = 0x00;
+        sendUplink(data, strlen(data),0,1);
+        uplink_counter++;
+        LoRa_Settings.Mport = 0x00;
+        break;
+    default:
+        break;
+    }
+    return 0;
+}
+
+
 unsigned int LoRaWANClass::getFrameCounter() {
     return Frame_Counter_Tx;
 }
@@ -451,5 +496,6 @@ void LoRaWANClass::setFrameCounter(unsigned int FrameCounter) {
 
 
 
-// define lora objet 
+
+// define lora object 
 LoRaWANClass lora;

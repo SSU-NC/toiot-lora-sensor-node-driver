@@ -68,6 +68,9 @@ typedef enum {
     RFM_REG_MODEM_CONFIG1   = 0x1D,
     RFM_REG_MODEM_CONFIG2   = 0x1E,
     RFM_REG_SYM_TIMEOUT_LSB = 0x1F,
+    RFM_REG_PKT_SNR_VALUE   = 0x19,
+    RFM_REG_PKT_RSSI_VALUE  = 0x1A,
+    RFM_REG_RSSI_VALUE      = 0x1B,
     RFM_REG_PREAMBLE_MSB    = 0x20,
     RFM_REG_PREAMBLE_LSB    = 0x21,
     RFM_REG_PAYLOAD_LENGTH  = 0x22,
@@ -99,7 +102,7 @@ typedef enum {
 * FUNCTION PROTOTYPES
 *****************************************************************************************
 */
-
+unsigned char RFM_Read(unsigned char RFM_Address);
 bool RFM_Init();
 void RFM_Send_Package(sBuffer *RFM_Tx_Package, sSettings *LoRa_Settings);
 message_t RFM_Single_Receive(sSettings *LoRa_Settings);

@@ -261,7 +261,7 @@
 *****************************************************************************************
 */
 
-static unsigned char RFM_Read(unsigned char RFM_Address)
+unsigned char RFM_Read(unsigned char RFM_Address)
 {
   unsigned char RFM_Data;
 

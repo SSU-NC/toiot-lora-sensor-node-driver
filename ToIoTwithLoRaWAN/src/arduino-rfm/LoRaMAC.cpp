@@ -41,17 +41,17 @@
 *****************************************************************************************
 */
 void LORA_Cycle(sBuffer *Data_Tx, sBuffer *Data_Rx, RFM_command_t *RFM_Command, sLoRa_Session *Session_Data,
- 									sLoRa_OTAA *OTAA_Data, sLoRa_Message *Message_Rx, sSettings *LoRa_Settings)
+ 									sLoRa_OTAA *OTAA_Data, sLoRa_Message *Message_Tx, sLoRa_Message *Message_Rx, sSettings *LoRa_Settings)
 {
-	static const unsigned int Receive_Delay_1 = 5000;
-	static const unsigned int Receive_Delay_2 = 1000;
+	static const unsigned int Receive_Delay_1 = 2000;
+	static const unsigned int Receive_Delay_2 = 3000;
 	unsigned long prevTime = 0;
 
 	//Transmit
 	if(*RFM_Command == NEW_RFM_COMMAND)
 	{
     	//Lora send data
-		LORA_Send_Data(Data_Tx, Session_Data, LoRa_Settings);
+		LORA_Send_Data(Data_Tx, Session_Data, Message_Tx, LoRa_Settings);
 		
 		prevTime = millis();
 		
@@ -124,7 +124,7 @@ void LORA_Cycle(sBuffer *Data_Tx, sBuffer *Data_Rx, RFM_command_t *RFM_Command, 
 *				*LoRa_Settings pointer to sSetting struct
 *****************************************************************************************
 */
-void LORA_Send_Data(sBuffer *Data_Tx, sLoRa_Session *Session_Data, sSettings *LoRa_Settings)
+void LORA_Send_Data(sBuffer *Data_Tx, sLoRa_Session *Session_Data, sLoRa_Message *Message_Tx, sSettings *LoRa_Settings)
 {
   //Define variables
   unsigned char i;
@@ -137,7 +137,7 @@ void LORA_Send_Data(sBuffer *Data_Tx, sLoRa_Session *Session_Data, sSettings *Lo
   sLoRa_Message Message;
 
   Message.MAC_Header = 0x00;
-  Message.Frame_Port = 0x01; //Frame port always 1 for now
+  Message.Frame_Port = Message_Tx->Frame_Port;
   Message.Frame_Control = 0x00;
 
   //Load device address from session data into the message
@@ -196,8 +196,10 @@ void LORA_Send_Data(sBuffer *Data_Tx, sLoRa_Session *Session_Data, sSettings *Lo
     RFM_Package.Counter++;
 
     //Encrypt the data
-    Encrypt_Payload(Data_Tx, Session_Data->AppSKey, &Message);
-
+    if (RFM_Package.Data[8] != 0x00)
+		Encrypt_Payload(Data_Tx, Session_Data->AppSKey, &Message);
+	else
+		Encrypt_Payload(Data_Tx, Session_Data->NwkSKey, &Message);
     //Load Data
     for(i = 0; i < Data_Tx->Counter; i++)
     {
@@ -430,7 +432,7 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
 					}
 					Serial.println();
 
-					//Check frame port fiels. When zero it is a mac command message encrypted with NwkSKey
+					//Check frame port fields. When zero it is a mac command message encrypted with NwkSKey
 					if(Message->Frame_Port == 0x00)
 					{
 						Encrypt_Payload(Data_Rx, Session_Data->NwkSKey, Message);
