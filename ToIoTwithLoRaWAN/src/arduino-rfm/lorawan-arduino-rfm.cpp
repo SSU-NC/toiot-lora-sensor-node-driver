@@ -473,9 +473,9 @@ int LoRaWANClass::handle_mac_cmd_req(unsigned char cid, unsigned int *uplink_cou
         char data[15];
         data[0] = DevStatusAns;
         data[1] = 255;
-        data[1] = get_pkt_snr();
+        data[2] = get_pkt_snr();
         Message_Tx.Frame_Port = 0x00;
-        sendUplink(data, strlen(data),0,1);
+        sendUplink(data, strlen(data),0,0);
         uplink_counter++;
         LoRa_Settings.Mport = 0x00;
         break;
