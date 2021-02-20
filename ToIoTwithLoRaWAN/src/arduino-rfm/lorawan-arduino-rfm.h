@@ -81,7 +81,10 @@ class LoRaWANClass
         void setTxPower(int level,txPin_t pinTx);
         int readData(char *outBuff);
         bool readAck(void);
+        bool readMac(void);
+        int get_pkt_snr(void);
         void update(void);
+        int handle_mac_cmd_req(unsigned char cid, unsigned int *uplink_counter);
 
         // frame counter
         unsigned int getFrameCounter();
@@ -97,6 +100,7 @@ class LoRaWANClass
         unsigned char Data_Rx[MAX_DOWNLINK_PAYLOAD_SIZE];
         sBuffer Buffer_Rx;
         sLoRa_Message Message_Rx;
+        sLoRa_Message Message_Tx;
 
         // Declare ABP session
         unsigned char Address_Tx[4];
@@ -132,6 +136,8 @@ class LoRaWANClass
 
         // ACK reception
         ack_t Ack_Status;
+
+        maccmd_t Rx_Mac_Command_Status;
 };
 
 #endif
