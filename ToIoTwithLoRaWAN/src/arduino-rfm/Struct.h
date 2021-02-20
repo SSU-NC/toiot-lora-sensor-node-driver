@@ -168,6 +168,19 @@ typedef enum {NO_RX, NEW_RX} rx_t;
 
 typedef enum {NO_ACK, NEW_ACK} ack_t;
 
+typedef enum {NO_MAC_COMMAND, NEW_MAC_COMMAND_FRMPayload, NEW_MAC_COMMAND_FOpt} maccmd_t;
+
+typedef enum {
+    ResetInd                = 0x01,
+    ResetConf               = 0x01,
+    LinkCheckReq            = 0x02,
+    LinkCheckAns            = 0x02,
+    LinkADRReq              = 0x03,
+    LinkADRAns              = 0x03,
+    DevStatusReq            = 0x06,
+    DevStatusAns            = 0x06
+} cid_t;
+
 #endif
 
 
