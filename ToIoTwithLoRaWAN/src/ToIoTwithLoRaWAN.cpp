@@ -41,9 +41,7 @@ void ToIoTwithLoRaWAN::pub(char* sensorId, int cnt, ...)
             }
         }
         va_end(ap);
-
         previousMillis = millis(); 
-        
         if(QOS){
             if ((uplink_counter > 0) && !sender_lock){
                 lora.sendUplink(msg, strlen(msg), 1, 1);
@@ -55,6 +53,10 @@ void ToIoTwithLoRaWAN::pub(char* sensorId, int cnt, ...)
                 Serial.print("[Pub] ");
                 Serial.println(msg);
             }
+            else{
+                lora.sendUplink(last_msg, strlen(last_msg), 1, 1);
+            }
+            strcpy(last_msg, msg);
             sender_lock = true;
         }
         else{
@@ -80,8 +82,7 @@ void ToIoTwithLoRaWAN::pub(char* sensorId, int cnt, ...)
         }
         if(lora.readMac()){
             Serial.println("MAC Command received!");
-            //sender_lock = true;
-            lora.handle_mac_cmd_req(outStr[0],&uplink_counter);
+            lora.handle_mac_cmd_req(outStr,&uplink_counter, lora);
         }
     }
     

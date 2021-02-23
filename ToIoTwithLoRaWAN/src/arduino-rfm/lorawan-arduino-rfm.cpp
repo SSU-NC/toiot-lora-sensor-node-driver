@@ -465,12 +465,15 @@ void LoRaWANClass::randomChannel()
 
 
 
-int LoRaWANClass::handle_mac_cmd_req(unsigned char cid, unsigned int *uplink_counter)
+int LoRaWANClass::handle_mac_cmd_req(char outstr[], unsigned int *uplink_counter, LoRaWANClass& lora)
 {
-    switch (cid)
+    int aid;
+    int value = 0; 
+    int sleep = 0;
+    switch (outstr[0]) // [0]: CID
     {
     case DevStatusReq:
-        char data[15];
+        char data[5];
         data[0] = DevStatusAns;
         data[1] = 255;
         data[2] = get_pkt_snr();
@@ -478,6 +481,26 @@ int LoRaWANClass::handle_mac_cmd_req(unsigned char cid, unsigned int *uplink_cou
         sendUplink(data, strlen(data),0,0);
         uplink_counter++;
         LoRa_Settings.Mport = 0x00;
+
+        //lora.update();
+        break;
+    case ActuatorReq:
+        for(int i=1; i < strlen(outstr)/2; i++)
+        {
+            aid = outstr[1];
+            for(int j=0; j<5;j++)
+            {
+                if(Actuator_index[j] == aid){
+                    Actuator_previousMillis[j] = millis();
+                }
+            }
+
+
+            value = outstr[i*2];
+            sleep = outstr[1 + i*2];
+            Serial.print("Actuator Value: ");
+            Serial.println(value);
+        }
         break;
     default:
         break;
