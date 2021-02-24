@@ -13,7 +13,7 @@ const sRFM_pins RFM_pins = {
 ToIoTwithLoRaWAN t;
 double value = 0.0; 
 // Actuator 1
-Actuator a1;
+struct Actuator a1;
 
 void setup() {
   t.setupToIoTwithLoRaWAN(nodeId, interval, 0);
