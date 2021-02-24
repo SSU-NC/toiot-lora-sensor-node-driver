@@ -2,6 +2,9 @@
 #define ToIoTwithLoRaWAN_H
 
 #include <lorawan.h>
+#include "Servo.h"
+#include "Actuator.h"
+
 
 class ToIoTwithLoRaWAN
 {
@@ -9,6 +12,8 @@ class ToIoTwithLoRaWAN
         ToIoTwithLoRaWAN();
         void setupToIoTwithLoRaWAN(char* nodeI, const unsigned long intertimer, unsigned int QOS);
         void pub(char* sensorId, int cnt, ...);
+        void actuator_servo(struct Actuator* actptr, Servo* servoptr, int pin);
+        void set_target_actuator(struct Actuator *actptr);
     private:
         char topic[26];
         char* nodeId;
@@ -25,11 +30,7 @@ class ToIoTwithLoRaWAN
         unsigned int QOS;
         bool sender_lock;
 
-        int actuator();
-        // actuator sleep
-        int Actuator_list[5] = {NULL, NULL, NULL, NULL, NULL};
-        unsigned long Actuator_previousMillis[5];
-        unsigned long Actuator_interval[5];
+        struct Actuator* target_actuator;    // Maximum number of actuator is 5
 };
 
 #endif

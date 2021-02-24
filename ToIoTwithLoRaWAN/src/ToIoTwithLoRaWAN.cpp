@@ -19,6 +19,22 @@ void ToIoTwithLoRaWAN::setupToIoTwithLoRaWAN(char* nodeI, const unsigned long in
     snprintf(topic, 26, "data/%s", nodeId);
 }
 
+void ToIoTwithLoRaWAN::actuator_servo(struct Actuator* actptr, Servo* servoptr, int pin)
+{
+    if(millis() - actptr->previousMillis > actptr->interval[actptr->running_index]) {
+        actptr->previousMillis = millis();
+        servoptr->attach(pin);
+        servoptr->write(actptr->value[actptr->running_index]);
+        
+        actptr->running_index++;
+    }
+}
+
+void ToIoTwithLoRaWAN::set_target_actuator(struct Actuator *actptr)
+{
+    target_actuator = actptr;
+}
+
 void ToIoTwithLoRaWAN::pub(char* sensorId, int cnt, ...)
 {
 
@@ -82,7 +98,7 @@ void ToIoTwithLoRaWAN::pub(char* sensorId, int cnt, ...)
         }
         if(lora.readMac()){
             Serial.println("MAC Command received!");
-            lora.handle_mac_cmd_req(outStr,&uplink_counter, lora);
+            lora.handle_mac_cmd_req(outStr,&uplink_counter, target_actuator);
         }
     }
     
