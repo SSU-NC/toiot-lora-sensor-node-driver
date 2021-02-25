@@ -21,12 +21,19 @@ void ToIoTwithLoRaWAN::setupToIoTwithLoRaWAN(char* nodeI, const unsigned long in
 
 void ToIoTwithLoRaWAN::actuator_servo(struct Actuator* actptr, Servo* servoptr, int pin)
 {
-    if(millis() - actptr->previousMillis > actptr->interval[actptr->running_index]) {
-        actptr->previousMillis = millis();
-        servoptr->attach(pin);
-        servoptr->write(actptr->value[actptr->running_index]);
-        
-        actptr->running_index++;
+    if((actptr->run == true) && (actptr->running_index < actptr->values_len)) {
+        if(millis() - actptr->previousMillis > actptr->interval[actptr->running_index]) {
+            Serial.println("IF TEST");
+            actptr->previousMillis = millis();
+            servoptr->attach(pin);
+            servoptr->write(actptr->value[actptr->running_index]);
+            
+            actptr->running_index++;
+            if (actptr->running_index >= actptr->values_len)
+            {
+                actptr->run = false;
+            }
+        }
     }
 }
 

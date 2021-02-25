@@ -496,11 +496,12 @@ int LoRaWANClass::handle_mac_cmd_req(char outstr[], unsigned int *uplink_counter
             Serial.print("Actuator Sleep: ");
             Serial.println(sleep);
             
-            Serial.println("test1");
-            Serial.println(target_actuator->value[0]);  // exception ERROR
-            target_actuator->value[i-1] = value;        // exception ERROR
-            Serial.println("test2");
-            target_actuator->interval[0] = sleep*1000.0;
+            target_actuator->value[i-1] = value; 
+            target_actuator->interval[i-1] = sleep*1000.0;
+            target_actuator->values_len = i;
+            target_actuator->run = true;
+            target_actuator->running_index=0;
+            target_actuator->previousMillis = millis();
         }
         break;
     default:

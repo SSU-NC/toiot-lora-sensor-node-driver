@@ -13,7 +13,8 @@ const sRFM_pins RFM_pins = {
 ToIoTwithLoRaWAN t;
 double value = 0.0; 
 // Actuator 1
-Actuator a1;
+struct Actuator a1;
+Servo myservo;
 
 void setup() {
   t.setupToIoTwithLoRaWAN(nodeId, interval, 0);
@@ -34,6 +35,8 @@ void setup() {
 
   // Actuator setting
   a1.actuatorId = 1;
+  myservo.attach(2);
+  myservo.write(0);
 
   // Join procedure
   bool isJoined;
@@ -46,8 +49,6 @@ void setup() {
   }while(!isJoined);
   Serial.println("Joined to network");
 }
-
-Servo myservo;
 
 void loop() {
   t.pub("sensor-uuid-1", 1, value);
