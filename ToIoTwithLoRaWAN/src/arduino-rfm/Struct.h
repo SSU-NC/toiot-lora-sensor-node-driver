@@ -178,7 +178,9 @@ typedef enum {
     LinkADRReq              = 0x03,
     LinkADRAns              = 0x03,
     DevStatusReq            = 0x06,
-    DevStatusAns            = 0x06
+    DevStatusAns            = 0x06,
+    ActuatorReq             = 0x0E,
+    ActuatorAns             = 0x0E
 } cid_t;
 
 #endif

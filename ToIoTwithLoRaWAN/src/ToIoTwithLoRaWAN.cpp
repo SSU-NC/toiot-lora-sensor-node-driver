@@ -19,6 +19,29 @@ void ToIoTwithLoRaWAN::setupToIoTwithLoRaWAN(char* nodeI, const unsigned long in
     snprintf(topic, 26, "data/%s", nodeId);
 }
 
+void ToIoTwithLoRaWAN::actuator_servo(struct Actuator* actptr, Servo* servoptr, int pin)
+{
+    if((actptr->run == true) && (actptr->running_index < actptr->values_len)) {
+        if(millis() - actptr->previousMillis > actptr->interval[actptr->running_index]) {
+            Serial.println("IF TEST");
+            actptr->previousMillis = millis();
+            servoptr->attach(pin);
+            servoptr->write(actptr->value[actptr->running_index]);
+            
+            actptr->running_index++;
+            if (actptr->running_index >= actptr->values_len)
+            {
+                actptr->run = false;
+            }
+        }
+    }
+}
+
+void ToIoTwithLoRaWAN::set_target_actuator(struct Actuator *actptr)
+{
+    target_actuator = actptr;
+}
+
 void ToIoTwithLoRaWAN::pub(char* sensorId, int cnt, ...)
 {
 
@@ -41,9 +64,7 @@ void ToIoTwithLoRaWAN::pub(char* sensorId, int cnt, ...)
             }
         }
         va_end(ap);
-
         previousMillis = millis(); 
-        
         if(QOS){
             if ((uplink_counter > 0) && !sender_lock){
                 lora.sendUplink(msg, strlen(msg), 1, 1);
@@ -55,6 +76,10 @@ void ToIoTwithLoRaWAN::pub(char* sensorId, int cnt, ...)
                 Serial.print("[Pub] ");
                 Serial.println(msg);
             }
+            else{
+                lora.sendUplink(last_msg, strlen(last_msg), 1, 1);
+            }
+            strcpy(last_msg, msg);
             sender_lock = true;
         }
         else{
@@ -80,8 +105,7 @@ void ToIoTwithLoRaWAN::pub(char* sensorId, int cnt, ...)
         }
         if(lora.readMac()){
             Serial.println("MAC Command received!");
-            //sender_lock = true;
-            lora.handle_mac_cmd_req(outStr[0],&uplink_counter);
+            lora.handle_mac_cmd_req(outStr,&uplink_counter, target_actuator);
         }
     }
     

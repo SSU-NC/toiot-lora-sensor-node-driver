@@ -25,6 +25,7 @@
 
 #include "lorawan-arduino-rfm.h"
 #include "Conversions.h"
+#include "../Actuator.h"
 
 LoRaWANClass::LoRaWANClass()
 {
@@ -465,12 +466,16 @@ void LoRaWANClass::randomChannel()
 
 
 
-int LoRaWANClass::handle_mac_cmd_req(unsigned char cid, unsigned int *uplink_counter)
+int LoRaWANClass::handle_mac_cmd_req(char outstr[], unsigned int *uplink_counter, struct Actuator* target_actuator)
 {
-    switch (cid)
+    int aid;
+    int value = 0; 
+    unsigned long sleep = 0.0;
+    int j;
+    switch (outstr[0]) // [0]: CID
     {
     case DevStatusReq:
-        char data[15];
+        char data[5];
         data[0] = DevStatusAns;
         data[1] = 255;
         data[2] = get_pkt_snr();
@@ -478,6 +483,26 @@ int LoRaWANClass::handle_mac_cmd_req(unsigned char cid, unsigned int *uplink_cou
         sendUplink(data, strlen(data),0,0);
         uplink_counter++;
         LoRa_Settings.Mport = 0x00;
+
+        //lora.update();
+        break;
+    case ActuatorReq:
+        for(int i=1; i < strlen(outstr)/2; i++)
+        {
+            value = outstr[i*2];
+            sleep = outstr[1 + i*2];
+            Serial.print("Actuator Value: ");
+            Serial.println(value);
+            Serial.print("Actuator Sleep: ");
+            Serial.println(sleep);
+            
+            target_actuator->value[i-1] = value; 
+            target_actuator->interval[i-1] = sleep*1000.0;
+            target_actuator->values_len = i;
+            target_actuator->run = true;
+            target_actuator->running_index=0;
+            target_actuator->previousMillis = millis();
+        }
         break;
     default:
         break;

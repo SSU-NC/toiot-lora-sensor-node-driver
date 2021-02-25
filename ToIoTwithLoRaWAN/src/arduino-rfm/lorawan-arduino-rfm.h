@@ -84,7 +84,7 @@ class LoRaWANClass
         bool readMac(void);
         int get_pkt_snr(void);
         void update(void);
-        int handle_mac_cmd_req(unsigned char cid, unsigned int *uplink_counter);
+        int handle_mac_cmd_req(char outstr[], unsigned int *uplink_counter, struct Actuator* target_actuator);
 
         // frame counter
         unsigned int getFrameCounter();
